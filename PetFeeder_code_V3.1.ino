@@ -468,7 +468,6 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "</section>");
 
   h += F("<section class='card'><div class='actions-grid'>"
-         "<button class='btn primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
          "<a class='btn warn' href='/reboot'>⟲ Reboot</a>"
