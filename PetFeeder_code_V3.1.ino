@@ -206,10 +206,17 @@ String commonHeaderCSS(){
     ":root.light .card{border-color:#e5e7eb;box-shadow:0 8px 20px rgba(0,0,0,.06)}\n"
     "button,.btn,input,select{border-radius:12px;border:1px solid #313244;background:#0f1016;color:#e5e7eb;padding:10px 12px}\n"
     ":root.light button,:root.light .btn,:root.light input,:root.light select{background:#f3f4f6;border-color:#d1d5db;color:#111827}\n"
+    ".btn{font:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}\n"
     "button.primary,.btn.primary{background:linear-gradient(90deg,var(--pri),var(--pri2));border:none;color:#fff}\n"
     ".pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid #2b2e45;color:#f0f1ff;background:rgba(0,0,0,.18)}\n"
     ".row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}\n"
     ".rowcol{display:grid;gap:6px}\n"
+    ".actions-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}\n"
+    ".actions-grid>:first-child{grid-column:1/-1}\n"
+    ".btn.warn{background:#f59e0b;color:#111827;border:none}\n"
+    ".btn.danger{background:#dc2626;color:#fff;border:none}\n"
+    ":root.light .btn.warn{background:#fbbf24;color:#111827}\n"
+    ":root.light .btn.danger{background:#f87171;color:#fff}\n"
     ".toast{position:fixed;right:16px;top:16px;display:grid;gap:10px;z-index:9999}\n"
     ".toast .t{background:#111827;color:#e5e7eb;border:1px solid #2b2e45;padding:10px 14px;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,.35)}\n"
     "svg,svg *{fill:currentColor!important;stroke:currentColor!important;stroke-width:0!important}\n"
@@ -231,7 +238,7 @@ String commonHeaderHTML(const String& title,const String& host){
          "<a class='icon' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
          "<button id='theme' class='icon' title='Basculer thème' aria-label='Thème'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7a1 1 0 0 1 1.41 0zM21 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM6.05 5.34a1 1 0 0 1 1.41 0l.7.7A1 1 0 0 1 6.75 7.46l-.7-.7a1 1 0 0 1 0-1.42zM12 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1zm1.64 7.36a1 1 0 0 1 1.41 0l.7.7a1 1 0 1 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm12.02 0a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7z'/></svg></button>"
          "</div>"
-         "<div style='flex-basis:100%;display:flex;justify-content:center;margin-top:8px'>"
+         "<div style='flex-basis:100%;display:flex;justify-content:flex-start;margin-top:8px'>"
          "<div class='pill'><svg width='16' height='16' viewBox='0 0 24 24'><path d='M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11a1 1 0 0 1-1 1H7a1 1 0 1 1 0-2h4V5a1 1 0 1 1 2 0Z'/></svg><span id='nowFr'>--:--:-- --/--/----</span></div>"
          "</div></header>");
   return h;
@@ -346,7 +353,7 @@ String htmlIndex(const String& host){
          "</div>"
          "<div class='actions' style='display:flex;gap:10px;justify-content:flex-end;margin-top:12px'>"
          "<button type='button' id='btnCancel'>Annuler</button>"
-         "<button type='button' id='btnSave' class='primary'>Enregistrer</button>"
+         "<button type='button' id='btnSave' class='btn primary'>Enregistrer</button>"
          "</div>"
          "</div></div>");
 
@@ -461,23 +468,28 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><label>Webhook URL</label><input name='webhook_url' value='"); h+=cfg.webhook_url; h+=F("'></div>"
          "</section>");
 
-  h += F("<section class='card'><div class='row'>"
-         "<button class='primary' type='submit'>💾 Enregistrer</button>"
+  h += F("<section class='card'><div class='actions-grid'>"
+         "<button class='btn primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
-         "<a class='btn' href='/reboot'>⟲ Reboot</a>"
-         "<a class='btn' href='/stats/clear'>🧹 Effacer historique 7j</a>"
-         "<a class='btn' href='/factory'>🔄 Réinitialiser usine</a>"
+         "<a class='btn warn' href='/reboot'>⟲ Reboot</a>"
+         "<a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a>"
+         "<a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a>"
          "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
          "</div></section></form>");
 
   h += F("<div class='toast' id='toast'></div>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{" 
+         "document.addEventListener('DOMContentLoaded',()=>{"
          "const q=(s)=>document.querySelector(s); const root=document.documentElement;"
          "function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');"
          "const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light');"
-         "const toastMsg='"+toastMsg+"'; if(toastMsg){const t=document.createElement('div'); t.className='t'; t.textContent=toastMsg; q('#toast').appendChild(t); setTimeout(()=>t.remove(),2200); }"
+         );
+  h += F("const toastMsg='");
+  h += toastMsg;
+  h += F("'; if(toastMsg){const t=document.createElement('div');"
+         "t.className='t'; t.textContent=toastMsg;"
+         "q('#toast').appendChild(t); setTimeout(()=>t.remove(),2200); }"
          "q('#btnImportCfg').onclick=()=>q('#fres_settings').click();"
          "q('#fres_settings').onchange=async()=>{const f=q('#fres_settings').files[0]; if(!f) return; const txt=await f.text(); await fetch('/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:txt}); location.href='/settings?saved=1';};"
          "function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock();"
