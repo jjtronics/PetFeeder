@@ -218,10 +218,7 @@ String commonHeaderCSS(){
 
 String commonHeaderHTML(const String& title,const String& host){
   String h;
-  h += F("<header><div style='min-width:260px'>"
-         "<div class='pill' style='margin-bottom:6px'>"
-         "<svg width='16' height='16' viewBox='0 0 24 24'><path d='M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11a1 1 0 0 1-1 1H7a1 1 0 1 1 0-2h4V5a1 1 0 1 1 2 0Z'/></svg>"
-         "<span id='nowFr'>--:--:-- --/--/----</span></div>");
+  h += F("<header><div style='min-width:260px'>");
   h += "<h1>"+title+"</h1>";
   h += "<div class='rowcol' style='margin-top:6px'>"
        "<div>Appareil : <b>"+host+"</b></div>"
@@ -233,6 +230,9 @@ String commonHeaderHTML(const String& title,const String& host){
          "<a class='icon' href='/logs' title='Logs'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z'/></svg></a>"
          "<a class='icon' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
          "<button id='theme' class='icon' title='Basculer thème' aria-label='Thème'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7a1 1 0 0 1 1.41 0zM21 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM6.05 5.34a1 1 0 0 1 1.41 0l.7.7A1 1 0 0 1 6.75 7.46l-.7-.7a1 1 0 0 1 0-1.42zM12 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1zm1.64 7.36a1 1 0 0 1 1.41 0l.7.7a1 1 0 1 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm12.02 0a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7z'/></svg></button>"
+         "</div>"
+         "<div style='flex-basis:100%;display:flex;justify-content:center;margin-top:8px'>"
+         "<div class='pill'><svg width='16' height='16' viewBox='0 0 24 24'><path d='M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11a1 1 0 0 1-1 1H7a1 1 0 1 1 0-2h4V5a1 1 0 1 1 2 0Z'/></svg><span id='nowFr'>--:--:-- --/--/----</span></div>"
          "</div></header>");
   return h;
 }
@@ -386,8 +386,8 @@ String htmlIndex(const String& host){
          "const btnFeed=$('#btnFeed'); if(btnFeed) btnFeed.onclick=async()=>{const r=await jget('/feed?n=1'); toast((r&&r.ok)?'Distribué':'Action bloquée'); refresh();};"
          "const btnUnclog=$('#btnUnclog'); if(btnUnclog) btnUnclog.onclick=async()=>{const r=await jget('/unclog'); toast((r&&r.ok)?'Débourrage OK':'Action bloquée');};"
          "const btnAdvance=$('#btnAdvance'); if(btnAdvance) btnAdvance.onclick=async()=>{const r=await jget('/feed_next'); toast((r&&r.ok)?'Distribué en avance':'Aucun créneau dispo'); refresh();};"
-         "const b5=$('#btnPlus5'); if(b5) b5.onclick=async()=>{const r=await jget('/feed_in?min=5&n=1'); toast((r&&r.ok)?'+5 min ajouté':'Erreur'); refresh();};"
-         "const b15=$('#btnPlus15'); if(b15) b15.onclick=async()=>{const r=await jget('/feed_in?min=15&n=1'); toast((r&&r.ok)?'+15 min ajouté':'Erreur'); refresh();};"
+         "const b5=$('#btnPlus5'); if(b5) b5.onclick=async()=>{const r=await jget('/feed_in?min=5&n=1'); toast((r&&r.ok)?'+5 min ajouté':'Erreur'); if(r&&r.ok){setTimeout(()=>location.reload(),300);} };"
+         "const b15=$('#btnPlus15'); if(b15) b15.onclick=async()=>{const r=await jget('/feed_in?min=15&n=1'); toast((r&&r.ok)?'+15 min ajouté':'Erreur'); if(r&&r.ok){setTimeout(()=>location.reload(),300);} };"
          "refresh(); setInterval(refresh,15000);"
          "}catch(e){console.error(e);}});"
          "</script>");
@@ -461,27 +461,30 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><label>Webhook URL</label><input name='webhook_url' value='"); h+=cfg.webhook_url; h+=F("'></div>"
          "</section>");
 
-  h += F("<div class='row'>"
+  h += F("<section class='card'><div class='row'>"
          "<button class='primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
          "<a class='btn' href='/reboot'>⟲ Reboot</a>"
+         "<a class='btn' href='/stats/clear'>🧹 Effacer historique 7j</a>"
+         "<a class='btn' href='/factory'>🔄 Réinitialiser usine</a>"
          "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
-         "</div></form>");
+         "</div></section></form>");
 
   h += F("<div class='toast' id='toast'></div>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{"
+         "document.addEventListener('DOMContentLoaded',()=>{" 
          "const q=(s)=>document.querySelector(s); const root=document.documentElement;"
          "function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');"
          "const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light');"
+         "const toastMsg='"+toastMsg+"'; if(toastMsg){const t=document.createElement('div'); t.className='t'; t.textContent=toastMsg; q('#toast').appendChild(t); setTimeout(()=>t.remove(),2200); }"
          "q('#btnImportCfg').onclick=()=>q('#fres_settings').click();"
          "q('#fres_settings').onchange=async()=>{const f=q('#fres_settings').files[0]; if(!f) return; const txt=await f.text(); await fetch('/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:txt}); location.href='/settings?saved=1';};"
          "function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock();"
          "fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});"
          "});"
          "</script></main></body></html>");
-  (void)toastMsg; (void)saved; return h;
+  (void)saved; return h;
 }
 
 // ---------- HTML LOGS ----------
@@ -499,7 +502,7 @@ String htmlLogsPage(){
   h += content;
   h += F("</pre></section></main>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>{ if(root.classList.contains('light')) root.classList.remove('light'); else root.classList.add('light'); localStorage.setItem('pf_theme',root.classList.contains('light')?'light':'dark'); }; fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
+         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
 }
@@ -520,14 +523,20 @@ String htmlUpdatePage(const String& msg){
   if(msg.length()){ h += "<p>"+msg+"</p>"; }
   h += F("</section></main>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>{ if(root.classList.contains('light')) root.classList.remove('light'); else root.classList.add('light'); localStorage.setItem('pf_theme',root.classList.contains('light')?'light':'dark'); }; fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
+         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
 }
 
 // ---------- HANDLERS ----------
 void handleRoot(){ server.send(200,"text/html; charset=utf-8", htmlIndex(hostName)); }
-void handleSettingsGet(){ server.send(200,"text/html; charset=utf-8", htmlSettingsPage(false,"")); }
+void handleSettingsGet(){
+  String msg="";
+  if(server.hasArg("saved")) msg="Paramètres enregistrés";
+  else if(server.hasArg("stats_cleared")) msg="Historique 7j supprimé";
+  else if(server.hasArg("factory")) msg="Réinitialisation effectuée";
+  server.send(200,"text/html; charset=utf-8", htmlSettingsPage(false,msg));
+}
 
 void handleReboot(){
   // Page avec compte à rebours et redirection automatique
@@ -591,6 +600,10 @@ void handleSettingsPost(){
 void handleLogs(){ server.send(200,"text/html; charset=utf-8", htmlLogsPage()); }
 void handleLogsDownload(){ if(!LittleFS.exists(LOG_PATH)){ server.send(200,"text/plain",""); return; } File f=LittleFS.open(LOG_PATH,"r"); server.streamFile(f,"text/plain"); f.close(); }
 void handleLogsClear(){ LittleFS.remove(LOG_PATH); server.sendHeader("Location","/logs"); server.send(302,"text/plain",""); }
+
+void handleStatsClear(){ LittleFS.remove(STATS_PATH); statsLoad(); statsEnsureToday(); server.sendHeader("Location","/settings?stats_cleared=1"); server.send(302,"text/plain",""); }
+
+void handleFactory(){ LittleFS.remove(CFG_PATH); LittleFS.remove(SCHED_PATH); LittleFS.remove(STATS_PATH); loadConfig(); scheduleLoad(); statsLoad(); statsEnsureToday(); server.sendHeader("Location","/settings?factory=1"); server.send(302,"text/plain",""); }
 
 void handleStatus(){
   StaticJsonDocument<4096> doc;
@@ -736,11 +749,13 @@ void setup(){
   server.on("/settings", HTTP_GET, handleSettingsGet);
   server.on("/settings", HTTP_POST, handleSettingsPost);
   server.on("/reboot", HTTP_GET, handleReboot);
-  server.on("/logs", HTTP_GET, handleLogs);
-  server.on("/logs/download", HTTP_GET, handleLogsDownload);
-  server.on("/logs/clear", HTTP_GET, handleLogsClear);
+    server.on("/logs", HTTP_GET, handleLogs);
+    server.on("/logs/download", HTTP_GET, handleLogsDownload);
+    server.on("/logs/clear", HTTP_GET, handleLogsClear);
+    server.on("/stats/clear", HTTP_GET, handleStatsClear);
+    server.on("/factory", HTTP_GET, handleFactory);
 
-  server.on("/status", HTTP_GET, handleStatus);
+    server.on("/status", HTTP_GET, handleStatus);
   server.on("/api/schedule", HTTP_GET, handleApiScheduleGet);
   server.on("/api/schedule", HTTP_POST, handleApiScheduleAdd);
   server.on("/api/schedule/update", HTTP_POST, handleApiScheduleUpdate);
