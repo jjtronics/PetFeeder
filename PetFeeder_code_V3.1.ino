@@ -473,11 +473,16 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
 
   h += F("<div class='toast' id='toast'></div>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{" 
+         "document.addEventListener('DOMContentLoaded',()=>{"
          "const q=(s)=>document.querySelector(s); const root=document.documentElement;"
          "function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');"
          "const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light');"
-         "const toastMsg='"+toastMsg+"'; if(toastMsg){const t=document.createElement('div'); t.className='t'; t.textContent=toastMsg; q('#toast').appendChild(t); setTimeout(()=>t.remove(),2200); }"
+         );
+  h += F("const toastMsg='");
+  h += toastMsg;
+  h += F("'; if(toastMsg){const t=document.createElement('div');"
+         "t.className='t'; t.textContent=toastMsg;"
+         "q('#toast').appendChild(t); setTimeout(()=>t.remove(),2200); }"
          "q('#btnImportCfg').onclick=()=>q('#fres_settings').click();"
          "q('#fres_settings').onchange=async()=>{const f=q('#fres_settings').files[0]; if(!f) return; const txt=await f.text(); await fetch('/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:txt}); location.href='/settings?saved=1';};"
          "function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock();"
