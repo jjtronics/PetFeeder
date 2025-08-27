@@ -210,6 +210,11 @@ String commonHeaderCSS(){
     ".pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid #2b2e45;color:#f0f1ff;background:rgba(0,0,0,.18)}\n"
     ".row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}\n"
     ".rowcol{display:grid;gap:6px}\n"
+    ".actions-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}\n"
+    ".btn.warn{background:#f59e0b;color:#111827;border:none}\n"
+    ".btn.danger{background:#dc2626;color:#fff;border:none}\n"
+    ":root.light .btn.warn{background:#fbbf24;color:#111827}\n"
+    ":root.light .btn.danger{background:#f87171;color:#fff}\n"
     ".toast{position:fixed;right:16px;top:16px;display:grid;gap:10px;z-index:9999}\n"
     ".toast .t{background:#111827;color:#e5e7eb;border:1px solid #2b2e45;padding:10px 14px;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,.35)}\n"
     "svg,svg *{fill:currentColor!important;stroke:currentColor!important;stroke-width:0!important}\n"
@@ -461,13 +466,13 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><label>Webhook URL</label><input name='webhook_url' value='"); h+=cfg.webhook_url; h+=F("'></div>"
          "</section>");
 
-  h += F("<section class='card'><div class='row'>"
+  h += F("<section class='card'><div class='actions-grid'>"
          "<button class='primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
-         "<a class='btn' href='/reboot'>⟲ Reboot</a>"
-         "<a class='btn' href='/stats/clear'>🧹 Effacer historique 7j</a>"
-         "<a class='btn' href='/factory'>🔄 Réinitialiser usine</a>"
+         "<a class='btn warn' href='/reboot'>⟲ Reboot</a>"
+         "<a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a>"
+         "<a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a>"
          "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
          "</div></section></form>");
 
