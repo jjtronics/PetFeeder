@@ -212,7 +212,6 @@ String commonHeaderCSS(){
     ".row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}\n"
     ".rowcol{display:grid;gap:6px}\n"
     ".actions-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}\n"
-    ".actions-grid>:first-child{grid-column:1/-1}\n"
     ".btn.warn{background:#f59e0b;color:#111827;border:none}\n"
     ".btn.danger{background:#dc2626;color:#fff;border:none}\n"
     ":root.light .btn.warn{background:#fbbf24;color:#111827}\n"
@@ -469,7 +468,6 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "</section>");
 
   h += F("<section class='card'><div class='actions-grid'>"
-         "<button class='btn primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
          "<a class='btn warn' href='/reboot'>⟲ Reboot</a>"
