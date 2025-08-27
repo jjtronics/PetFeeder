@@ -206,6 +206,7 @@ String commonHeaderCSS(){
     ":root.light .card{border-color:#e5e7eb;box-shadow:0 8px 20px rgba(0,0,0,.06)}\n"
     "button,.btn,input,select{border-radius:12px;border:1px solid #313244;background:#0f1016;color:#e5e7eb;padding:10px 12px}\n"
     ":root.light button,:root.light .btn,:root.light input,:root.light select{background:#f3f4f6;border-color:#d1d5db;color:#111827}\n"
+    ".btn{font:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}\n"
     "button.primary,.btn.primary{background:linear-gradient(90deg,var(--pri),var(--pri2));border:none;color:#fff}\n"
     ".pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid #2b2e45;color:#f0f1ff;background:rgba(0,0,0,.18)}\n"
     ".row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}\n"
@@ -236,7 +237,7 @@ String commonHeaderHTML(const String& title,const String& host){
          "<a class='icon' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
          "<button id='theme' class='icon' title='Basculer thème' aria-label='Thème'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7a1 1 0 0 1 1.41 0zM21 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM6.05 5.34a1 1 0 0 1 1.41 0l.7.7A1 1 0 0 1 6.75 7.46l-.7-.7a1 1 0 0 1 0-1.42zM12 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1zm1.64 7.36a1 1 0 0 1 1.41 0l.7.7a1 1 0 1 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm12.02 0a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7z'/></svg></button>"
          "</div>"
-         "<div style='flex-basis:100%;display:flex;justify-content:center;margin-top:8px'>"
+         "<div style='flex-basis:100%;display:flex;justify-content:flex-start;margin-top:8px'>"
          "<div class='pill'><svg width='16' height='16' viewBox='0 0 24 24'><path d='M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11a1 1 0 0 1-1 1H7a1 1 0 1 1 0-2h4V5a1 1 0 1 1 2 0Z'/></svg><span id='nowFr'>--:--:-- --/--/----</span></div>"
          "</div></header>");
   return h;
@@ -351,7 +352,7 @@ String htmlIndex(const String& host){
          "</div>"
          "<div class='actions' style='display:flex;gap:10px;justify-content:flex-end;margin-top:12px'>"
          "<button type='button' id='btnCancel'>Annuler</button>"
-         "<button type='button' id='btnSave' class='primary'>Enregistrer</button>"
+         "<button type='button' id='btnSave' class='btn primary'>Enregistrer</button>"
          "</div>"
          "</div></div>");
 
@@ -467,7 +468,6 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "</section>");
 
   h += F("<section class='card'><div class='actions-grid'>"
-         "<button class='primary' type='submit'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
          "<a class='btn warn' href='/reboot'>⟲ Reboot</a>"
