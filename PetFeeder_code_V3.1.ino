@@ -480,11 +480,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
          "</div></section>");
 
-  h += F("<section class='card grid g2'>"
-         "<div><a class='btn warn' href='/reboot'>⟲ Reboot</a></div>"
-         "<div><a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a></div>"
-         "<div><a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a></div>"
-         "</section></form>");
+  h += F("</form>");
 
   h += F("<div class='toast' id='toast'></div>"
          "<script>"
