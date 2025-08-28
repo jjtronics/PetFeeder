@@ -467,6 +467,12 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><label>Webhook URL</label><input name='webhook_url' value='"); h+=cfg.webhook_url; h+=F("'></div>"
          "</section>");
 
+  h += F("<section class='card grid g2'>"
+         "<div><a class='btn warn' href='/reboot'>⟲ Reboot</a></div>"
+         "<div><a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a></div>"
+         "<div><a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a></div>"
+         "</section>");
+
   h += F("<section class='card'><div class='actions-grid'>"
          "<button type='submit' class='btn primary'>💾 Enregistrer</button>"
          "<a class='btn' href='/backup'>📤 Exporter config</a>"
