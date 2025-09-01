@@ -120,6 +120,7 @@ struct Config {
   char     mqtt_user[32]   = "";
   char     mqtt_pass[32]   = "";
   char     webhook_url[128]= "";
+  bool     expert_mode     = false;
 } cfg;
 
 // ---------- UTILS ----------
@@ -157,8 +158,8 @@ bool scheduleSave(){ StaticJsonDocument<4096> d; JsonArray a=d.createNestedArray
 bool scheduleLoad(){ scheduleCount=0; for(uint8_t i=0;i<MAX_EVENTS;i++){ lastRunYDay[i]=0xFFFF; lastRunMinute[i]=0xFFFF; } if(!LittleFS.exists(SCHED_PATH)) return true; File f=LittleFS.open(SCHED_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; JsonArray a=d["events"].as<JsonArray>(); if(a.isNull()) return true; for(JsonObject o:a){ if(scheduleCount>=MAX_EVENTS) break; uint8_t hh=(uint8_t)(o["hour"]|0), mm=(uint8_t)(o["minute"]|0), rr=(uint8_t)(o["rations"]|1), dd=(uint8_t)(o["days"]|0x7F); if(hh<24&&mm<60&&rr>=1) scheduleList[scheduleCount++]={hh,mm,rr,dd}; } scheduleSort(); return true; }
 
 // ---------- CONFIG FILE ----------
-bool loadConfig(){ if(!LittleFS.exists(CFG_PATH)) return false; File f=LittleFS.open(CFG_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; strlcpy(cfg.device_name, d["device_name"]|"PetFeeder", sizeof(cfg.device_name)); strlcpy(cfg.ota_pass, d["ota_pass"]|"croquettes", sizeof(cfg.ota_pass)); strlcpy(cfg.tz, d["tz"]|"CET-1CEST,M3.5.0,M10.5.0/3", sizeof(cfg.tz)); cfg.portion_steps=(uint16_t)(d["portion_steps"]|200); cfg.step_us_slow=(uint16_t)(d["step_us_slow"]|1200); cfg.step_us_fast=(uint16_t)(d["step_us_fast"]|600); cfg.ramp_steps=(uint16_t)(d["ramp_steps"]|120); cfg.dir_invert=d["dir_invert"]|false; cfg.hold_enable=d["hold_enable"]|true; cfg.safe_mode=d["safe_mode"]|false; cfg.daily_quota=(uint8_t)(d["daily_quota"]|0); cfg.logs_enable=d["logs_enable"]|true; cfg.log_level=(uint8_t)(d["log_level"]|1); cfg.mqtt_enable=d["mqtt_enable"]|false; strlcpy(cfg.mqtt_host, d["mqtt_host"]|"", sizeof(cfg.mqtt_host)); cfg.mqtt_port=(uint16_t)(d["mqtt_port"]|1883); strlcpy(cfg.mqtt_topic, d["mqtt_topic"]|"petfeeder", sizeof(cfg.mqtt_topic)); strlcpy(cfg.mqtt_user, d["mqtt_user"]|"", sizeof(cfg.mqtt_user)); strlcpy(cfg.mqtt_pass, d["mqtt_pass"]|"", sizeof(cfg.mqtt_pass)); strlcpy(cfg.webhook_url, d["webhook_url"]|"", sizeof(cfg.webhook_url)); return true; }
-bool saveConfig(){ StaticJsonDocument<4096> d; d["device_name"]=cfg.device_name; d["ota_pass"]=cfg.ota_pass; d["tz"]=cfg.tz; d["portion_steps"]=cfg.portion_steps; d["step_us_slow"]=cfg.step_us_slow; d["step_us_fast"]=cfg.step_us_fast; d["ramp_steps"]=cfg.ramp_steps; d["dir_invert"]=cfg.dir_invert; d["hold_enable"]=cfg.hold_enable; d["safe_mode"]=cfg.safe_mode; d["daily_quota"]=cfg.daily_quota; d["logs_enable"]=cfg.logs_enable; d["log_level"]=cfg.log_level; d["mqtt_enable"]=cfg.mqtt_enable; d["mqtt_host"]=cfg.mqtt_host; d["mqtt_port"]=cfg.mqtt_port; d["mqtt_topic"]=cfg.mqtt_topic; d["mqtt_user"]=cfg.mqtt_user; d["mqtt_pass"]=cfg.mqtt_pass; d["webhook_url"]=cfg.webhook_url; File f=LittleFS.open(CFG_PATH,"w"); if(!f) return false; bool ok=serializeJson(d,f)>0; f.close(); return ok; }
+bool loadConfig(){ if(!LittleFS.exists(CFG_PATH)) return false; File f=LittleFS.open(CFG_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; strlcpy(cfg.device_name, d["device_name"]|"PetFeeder", sizeof(cfg.device_name)); strlcpy(cfg.ota_pass, d["ota_pass"]|"croquettes", sizeof(cfg.ota_pass)); strlcpy(cfg.tz, d["tz"]|"CET-1CEST,M3.5.0,M10.5.0/3", sizeof(cfg.tz)); cfg.portion_steps=(uint16_t)(d["portion_steps"]|200); cfg.step_us_slow=(uint16_t)(d["step_us_slow"]|1200); cfg.step_us_fast=(uint16_t)(d["step_us_fast"]|600); cfg.ramp_steps=(uint16_t)(d["ramp_steps"]|120); cfg.dir_invert=d["dir_invert"]|false; cfg.hold_enable=d["hold_enable"]|true; cfg.safe_mode=d["safe_mode"]|false; cfg.daily_quota=(uint8_t)(d["daily_quota"]|0); cfg.logs_enable=d["logs_enable"]|true; cfg.log_level=(uint8_t)(d["log_level"]|1); cfg.mqtt_enable=d["mqtt_enable"]|false; strlcpy(cfg.mqtt_host, d["mqtt_host"]|"", sizeof(cfg.mqtt_host)); cfg.mqtt_port=(uint16_t)(d["mqtt_port"]|1883); strlcpy(cfg.mqtt_topic, d["mqtt_topic"]|"petfeeder", sizeof(cfg.mqtt_topic)); strlcpy(cfg.mqtt_user, d["mqtt_user"]|"", sizeof(cfg.mqtt_user)); strlcpy(cfg.mqtt_pass, d["mqtt_pass"]|"", sizeof(cfg.mqtt_pass)); strlcpy(cfg.webhook_url, d["webhook_url"]|"", sizeof(cfg.webhook_url)); cfg.expert_mode=d["expert_mode"]|false; return true; }
+bool saveConfig(){ StaticJsonDocument<4096> d; d["device_name"]=cfg.device_name; d["ota_pass"]=cfg.ota_pass; d["tz"]=cfg.tz; d["portion_steps"]=cfg.portion_steps; d["step_us_slow"]=cfg.step_us_slow; d["step_us_fast"]=cfg.step_us_fast; d["ramp_steps"]=cfg.ramp_steps; d["dir_invert"]=cfg.dir_invert; d["hold_enable"]=cfg.hold_enable; d["safe_mode"]=cfg.safe_mode; d["daily_quota"]=cfg.daily_quota; d["logs_enable"]=cfg.logs_enable; d["log_level"]=cfg.log_level; d["mqtt_enable"]=cfg.mqtt_enable; d["mqtt_host"]=cfg.mqtt_host; d["mqtt_port"]=cfg.mqtt_port; d["mqtt_topic"]=cfg.mqtt_topic; d["mqtt_user"]=cfg.mqtt_user; d["mqtt_pass"]=cfg.mqtt_pass; d["webhook_url"]=cfg.webhook_url; d["expert_mode"]=cfg.expert_mode; File f=LittleFS.open(CFG_PATH,"w"); if(!f) return false; bool ok=serializeJson(d,f)>0; f.close(); return ok; }
 
 // ---------- MOTOR ----------
 void driverEnable(bool on){ digitalWrite(PIN_EN, on?LOW:HIGH); }
@@ -233,8 +234,8 @@ String commonHeaderHTML(const String& title,const String& host){
   h += F("<div class='actions'>"
          "<a class='icon' href='/' title='Accueil'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M10 19v-5h4v5h5v-8h3L12 3 2 11h3v8z'/></svg></a>"
          "<a class='icon' href='/settings' title='Paramètres'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M19.14,12.94a7.48,7.48,0,0,0,.05-1l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.09,7.09,0,0,0-1.73-1l-.38-2.65A.5.5,0,0,0,13.72,3H10.28a.5.5,0,1,1-.49.41L9.41,6.06a7.09,7.09,0,0,0-1.73,1l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L4.86,11a7.48,7.48,0,0,0,0,2l-2.11,1.65a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49,1a7.09,7.09,0,0,0,1.73,1l.38,2.65a.5.5,0,0,0,.49.41h3.44a.5.5,0,0,0,.49-.41l.38-2.65a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0,.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z'/></svg></a>"
-         "<a class='icon' href='/logs' title='Logs'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z'/></svg></a>"
-         "<a class='icon' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
+         "<a class='icon adv' href='/logs' title='Logs'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z'/></svg></a>"
+         "<a class='icon adv' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
          "<button id='theme' class='icon' title='Basculer thème' aria-label='Thème'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7a1 1 0 0 1 1.41 0zM21 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM6.05 5.34a1 1 0 0 1 1.41 0l.7.7A1 1 0 0 1 6.75 7.46l-.7-.7a1 1 0 0 1 0-1.42zM12 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1zm1.64 7.36a1 1 0 0 1 1.41 0l.7.7a1 1 0 1 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm12.02 0a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7z'/></svg></button>"
          "</div>"
          "<div style='flex-basis:100%;display:flex;justify-content:flex-start;margin-top:8px'>"
@@ -425,19 +426,27 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += commonHeaderCSS();
   h += F(".grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}"
          "label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}"
+         ".adv{display:none}.expert .adv{display:block}"
   );
-  h += F("</style></head><body>");
+  h += F("</style></head><body");
+  if(cfg.expert_mode) h += F(" class='expert'");
+  h += F(">");
   h += commonHeaderHTML("⚙ Paramètres", hostName);
   h += F("<main><form method='POST' action='/settings' class='grid'>");
 
   h += F("<section class='card grid g2'>"
          "<div><label>Nom de l'appareil</label><input name='device_name' value='"); h+=cfg.device_name;
-  h += F("'></div><div><label>Mot de passe OTA</label><input name='ota_pass' value='"); h+=cfg.ota_pass; h+=F("'></div>"
+  h += F("'></div>"
          "<div><label>Fuseau horaire (préréglages)</label><select name='tz_sel'>"); h+=opts; h+=F("</select></div>"
+         "<div><label>Quota/jour (rations, 0 = illimité)</label><input type='number' min='0' max='200' name='daily_quota' value='"); h+=String(cfg.daily_quota); h+=F("'></div>"
+         "</section>");
+
+  h += F("<section class='card grid g2 adv'>"
+         "<div><label>Mot de passe OTA</label><input name='ota_pass' value='"); h+=cfg.ota_pass; h+=F("'></div>"
          "<div><label>Fuseau horaire (avancé/POSIX)</label><input name='tz_adv' placeholder='ex: CET-1CEST,M3.5.0,M10.5.0/3'></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
+  h += F("<section class='card grid g2 adv'>"
          "<div><label>Portion (pas / ration)</label><input type='number' min='10' max='20000' name='portion_steps' value='"); h+=String(cfg.portion_steps);
   h += F("'></div><div><label>Step µs (lent)</label><input type='number' min='100' max='5000' name='step_us_slow' value='"); h+=String(cfg.step_us_slow);
   h += F("'></div><div><label>Step µs (rapide)</label><input type='number' min='100' max='5000' name='step_us_fast' value='"); h+=String(cfg.step_us_fast);
@@ -445,10 +454,9 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += F("'></div><div><label><input type='checkbox' name='dir_invert' "); if(cfg.dir_invert) h+=F("checked"); h+=F("> Inversion sens</label></div>"
          "<div><label><input type='checkbox' name='hold_enable' "); if(cfg.hold_enable) h+=F("checked"); h+=F("> Maintien couple (EN LOW)</label></div>"
          "<div><label><input type='checkbox' name='safe_mode' "); if(cfg.safe_mode) h+=F("checked"); h+=F("> Mode Safe</label></div>"
-         "<div><label>Quota/jour (rations, 0 = illimité)</label><input type='number' min='0' max='200' name='daily_quota' value='"); h+=String(cfg.daily_quota); h+=F("'></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
+  h += F("<section class='card grid g2 adv'>"
          "<div><label><input type='checkbox' name='logs_enable' "); if(cfg.logs_enable) h+=F("checked"); h+=F("> Activer logs</label></div>"
          "<div><label>Niveau de logs</label><select name='log_level'>"
          "<option value='0' "); if(cfg.log_level==0) h+=F("selected"); h+=F(">Erreurs</option>"
@@ -457,8 +465,8 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "</select></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
-         "<div><label><input type='checkbox' name='mqtt_enable' "); if(cfg.mqtt_enable) h+=F("checked"); h+=F("> Activer MQTT</label></div>"
+  h += F("<section class='card grid g2 adv'>"
+        "<div><label><input type='checkbox' name='mqtt_enable' "); if(cfg.mqtt_enable) h+=F("checked"); h+=F("> Activer MQTT</label></div>"
          "<div><label>Broker</label><input name='mqtt_host' value='"); h+=cfg.mqtt_host;
   h += F("'></div><div><label>Port</label><input type='number' name='mqtt_port' value='"); h+=String(cfg.mqtt_port);
   h += F("'></div><div><label>Topic</label><input name='mqtt_topic' value='"); h+=cfg.mqtt_topic;
@@ -471,13 +479,14 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><a class='btn warn' href='/reboot'>⟲ Reboot</a></div>"
          "<div><a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a></div>"
          "<div><a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a></div>"
+         "<div><label><input type='checkbox' name='expert_mode' id='expert_mode' "); if(cfg.expert_mode) h+=F("checked"); h+=F("> Mode expert</label></div>"
          "</section>");
 
   h += F("<section class='card'><div class='actions-grid'>"
          "<button type='submit' class='btn primary'>💾 Enregistrer</button>"
-         "<a class='btn' href='/backup'>📤 Exporter config</a>"
-         "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
-         "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
+         "<a class='btn adv' href='/backup'>📤 Exporter config</a>"
+         "<button type='button' id='btnImportCfg' class='btn adv'>📥 Importer config…</button>"
+         "<input type='file' id='fres_settings' class='adv' style='display:none' accept='application/json'>"
          "</div></section>");
 
   h += F("</form>");
@@ -498,6 +507,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "q('#fres_settings').onchange=async()=>{const f=q('#fres_settings').files[0]; if(!f) return; const txt=await f.text(); await fetch('/restore',{method:'POST',headers:{'Content-Type':'application/json'},body:txt}); location.href='/settings?saved=1';};"
          "function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock();"
          "fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});"
+         "const expertToggle=q('#expert_mode'); if(expertToggle) expertToggle.onchange=()=>{document.body.classList.toggle('expert',expertToggle.checked);};"
          "});"
          "</script></main></body></html>");
   (void)saved; return h;
@@ -588,6 +598,7 @@ void handleSettingsPost(){
   cfg.dir_invert  = server.hasArg("dir_invert");
   cfg.hold_enable = server.hasArg("hold_enable");
   cfg.safe_mode   = server.hasArg("safe_mode");
+  cfg.expert_mode = server.hasArg("expert_mode");
 
   if(server.hasArg("daily_quota"))   { long v=server.arg("daily_quota").toInt();   if(v<0)v=0;    if(v>200)v=200;     cfg.daily_quota=(uint8_t)v; }
 
@@ -613,9 +624,9 @@ void handleSettingsPost(){
   server.send(200,"text/html; charset=utf-8", htmlSettingsPage(true,"Paramètres enregistrés"));
 }
 
-void handleLogs(){ server.send(200,"text/html; charset=utf-8", htmlLogsPage()); }
-void handleLogsDownload(){ if(!LittleFS.exists(LOG_PATH)){ server.send(200,"text/plain",""); return; } File f=LittleFS.open(LOG_PATH,"r"); server.streamFile(f,"text/plain"); f.close(); }
-void handleLogsClear(){ LittleFS.remove(LOG_PATH); server.sendHeader("Location","/logs"); server.send(302,"text/plain",""); }
+void handleLogs(){ if(!cfg.expert_mode){ server.send(403,"text/plain","Forbidden"); return; } server.send(200,"text/html; charset=utf-8", htmlLogsPage()); }
+void handleLogsDownload(){ if(!cfg.expert_mode){ server.send(403,"text/plain","Forbidden"); return; } if(!LittleFS.exists(LOG_PATH)){ server.send(200,"text/plain",""); return; } File f=LittleFS.open(LOG_PATH,"r"); server.streamFile(f,"text/plain"); f.close(); }
+void handleLogsClear(){ if(!cfg.expert_mode){ server.send(403,"text/plain","Forbidden"); return; } LittleFS.remove(LOG_PATH); server.sendHeader("Location","/logs"); server.send(302,"text/plain",""); }
 
 void handleStatsClear(){ LittleFS.remove(STATS_PATH); statsLoad(); statsEnsureToday(); server.sendHeader("Location","/settings?stats_cleared=1"); server.send(302,"text/plain",""); }
 
@@ -699,8 +710,9 @@ void handleBackup(){
 void handleRestore(){ if(!server.hasArg("plain")){ server.send(400,"text/plain","Missing body"); return; } StaticJsonDocument<8192> d; DeserializationError e=deserializeJson(d,server.arg("plain")); if(e){ server.send(400,"text/plain","Bad JSON"); return; } if(d.containsKey("config")){ File f=LittleFS.open(CFG_PATH,"w"); if(f){ serializeJson(d["config"],f); f.close(); loadConfig(); } } if(d.containsKey("schedule")){ File f=LittleFS.open(SCHED_PATH,"w"); if(f){ serializeJson(d["schedule"],f); f.close(); scheduleLoad(); } } server.sendHeader("Location","/settings?saved=1"); server.send(302,"text/plain",""); }
 
 // Update
-void handleUpdateGet(){ server.send(200,"text/html; charset=utf-8", htmlUpdatePage("")); }
+void handleUpdateGet(){ if(!cfg.expert_mode){ server.send(403,"text/plain","Forbidden"); return; } server.send(200,"text/html; charset=utf-8", htmlUpdatePage("")); }
 void handleUpdatePost(){
+  if(!cfg.expert_mode){ return; }
   HTTPUpload& up = server.upload();
   if(up.status==UPLOAD_FILE_START){
     logEvent(LOG_INFO,"UPDATE","start "+String(up.filename));
@@ -787,7 +799,7 @@ void setup(){
   server.on("/restore", HTTP_POST, handleRestore);
 
   server.on("/update", HTTP_GET, handleUpdateGet);
-  server.on("/update", HTTP_POST, [](){}, handleUpdatePost);
+  server.on("/update", HTTP_POST, [](){ if(!cfg.expert_mode){ server.send(403,"text/plain","Forbidden"); return; } }, handleUpdatePost);
 
   server.on("/manifest.json", HTTP_GET, handleManifest);
   server.on("/sw.js", HTTP_GET, handleSW);
