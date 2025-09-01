@@ -425,6 +425,11 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += commonHeaderCSS();
   h += F(".grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}"
          "label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}"
+         ".switchRow{display:flex;align-items:center;gap:8px}"
+         ".switchRow input{appearance:none;width:40px;height:20px;background:#555;border-radius:10px;position:relative;cursor:pointer;outline:none}"
+         ".switchRow input:before{content:'';position:absolute;width:18px;height:18px;top:1px;left:1px;background:#fff;border-radius:50%;transition:.2s}"
+         ".switchRow input:checked{background:var(--pri)}"
+         ".switchRow input:checked:before{transform:translateX(20px)}"
   );
   h += F("</style></head><body>");
   h += commonHeaderHTML("⚙ Paramètres", hostName);
@@ -432,12 +437,13 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
 
   h += F("<section class='card grid g2'>"
          "<div><label>Nom de l'appareil</label><input name='device_name' value='"); h+=cfg.device_name;
-  h += F("'></div><div><label>Mot de passe OTA</label><input name='ota_pass' value='"); h+=cfg.ota_pass; h+=F("'></div>"
+  h += F("'></div><div class='adv' style='display:none'><label>Mot de passe OTA</label><input name='ota_pass' value='"); h+=cfg.ota_pass; h+=F("'></div>"
          "<div><label>Fuseau horaire (préréglages)</label><select name='tz_sel'>"); h+=opts; h+=F("</select></div>"
-         "<div><label>Fuseau horaire (avancé/POSIX)</label><input name='tz_adv' placeholder='ex: CET-1CEST,M3.5.0,M10.5.0/3'></div>"
+         "<div class='adv' style='display:none'><label>Fuseau horaire (avancé/POSIX)</label><input name='tz_adv' placeholder='ex: CET-1CEST,M3.5.0,M10.5.0/3'></div>"
+         "<div><label>Quota/jour (rations, 0 = illimité)</label><input type='number' min='0' max='200' name='daily_quota' value='"); h+=String(cfg.daily_quota); h+=F("'></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
+  h += F("<section class='card grid g2 adv' style='display:none'>"
          "<div><label>Portion (pas / ration)</label><input type='number' min='10' max='20000' name='portion_steps' value='"); h+=String(cfg.portion_steps);
   h += F("'></div><div><label>Step µs (lent)</label><input type='number' min='100' max='5000' name='step_us_slow' value='"); h+=String(cfg.step_us_slow);
   h += F("'></div><div><label>Step µs (rapide)</label><input type='number' min='100' max='5000' name='step_us_fast' value='"); h+=String(cfg.step_us_fast);
@@ -445,10 +451,9 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += F("'></div><div><label><input type='checkbox' name='dir_invert' "); if(cfg.dir_invert) h+=F("checked"); h+=F("> Inversion sens</label></div>"
          "<div><label><input type='checkbox' name='hold_enable' "); if(cfg.hold_enable) h+=F("checked"); h+=F("> Maintien couple (EN LOW)</label></div>"
          "<div><label><input type='checkbox' name='safe_mode' "); if(cfg.safe_mode) h+=F("checked"); h+=F("> Mode Safe</label></div>"
-         "<div><label>Quota/jour (rations, 0 = illimité)</label><input type='number' min='0' max='200' name='daily_quota' value='"); h+=String(cfg.daily_quota); h+=F("'></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
+  h += F("<section class='card grid g2 adv' style='display:none'>"
          "<div><label><input type='checkbox' name='logs_enable' "); if(cfg.logs_enable) h+=F("checked"); h+=F("> Activer logs</label></div>"
          "<div><label>Niveau de logs</label><select name='log_level'>"
          "<option value='0' "); if(cfg.log_level==0) h+=F("selected"); h+=F(">Erreurs</option>"
@@ -457,7 +462,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "</select></div>"
          "</section>");
 
-  h += F("<section class='card grid g2'>"
+  h += F("<section class='card grid g2 adv' style='display:none'>"
          "<div><label><input type='checkbox' name='mqtt_enable' "); if(cfg.mqtt_enable) h+=F("checked"); h+=F("> Activer MQTT</label></div>"
          "<div><label>Broker</label><input name='mqtt_host' value='"); h+=cfg.mqtt_host;
   h += F("'></div><div><label>Port</label><input type='number' name='mqtt_port' value='"); h+=String(cfg.mqtt_port);
@@ -471,13 +476,14 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div><a class='btn warn' href='/reboot'>⟲ Reboot</a></div>"
          "<div><a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a></div>"
          "<div><a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a></div>"
+         "<div class='switchRow'><label>Mode expert</label><input type='checkbox' id='expertToggle'></div>"
          "</section>");
 
   h += F("<section class='card'><div class='actions-grid'>"
          "<button type='submit' class='btn primary'>💾 Enregistrer</button>"
-         "<a class='btn' href='/backup'>📤 Exporter config</a>"
-         "<button type='button' id='btnImportCfg' class='btn'>📥 Importer config…</button>"
-         "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
+         "<a class='btn adv' style='display:none' href='/backup'>📤 Exporter config</a>"
+         "<button type='button' id='btnImportCfg' class='btn adv' style='display:none'>📥 Importer config…</button>"
+         "<input type='file' id='fres_settings' class='adv' style='display:none' accept='application/json'>"
          "</div></section>");
 
   h += F("</form>");
@@ -488,6 +494,9 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "const q=(s)=>document.querySelector(s); const root=document.documentElement;"
          "function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');"
          "const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light');"
+         "const expertToggle=q('#expertToggle'); const advEls=document.querySelectorAll('.adv');"
+         "function applyExpert(on){advEls.forEach(e=>e.style.display=on?'':'none'); if(expertToggle) expertToggle.checked=on; localStorage.setItem('pf_expert',on?'1':'0');}"
+         "applyExpert(localStorage.getItem('pf_expert')==='1'); if(expertToggle) expertToggle.onchange=()=>applyExpert(expertToggle.checked);"
          );
   h += F("const toastMsg='");
   h += toastMsg;

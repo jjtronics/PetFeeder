@@ -16,6 +16,7 @@ PetFeeder is an open‑source connected cat feeder based on an ESP8266 (Wemos D1
 - Self‑hosted Wi‑Fi configuration portal (WiFiManager)
 - Responsive Web UI with schedule management and manual actions
 - Daily quota tracking with 7‑day history chart
+- Expert mode toggle to reveal advanced settings
 - OTA firmware updates with configurable password
 - Local JSON API endpoints
 - Physical button for feed/unclog/safe‑mode toggle
@@ -83,6 +84,7 @@ PetFeeder est un distributeur de croquettes connecté basé sur un ESP8266 (Wemo
 - Portail de configuration Wi‑Fi autonome (WiFiManager)
 - Interface Web responsive pour gérer le planning et les actions manuelles
 - Suivi du quota journalier avec graphique sur 7 jours
+- Mode Expert pour afficher les paramètres avancés
 - Mises à jour OTA avec mot de passe configurable
 - API JSON locale
 - Bouton physique pour nourrir/débourrer/activer le mode sécurisé
