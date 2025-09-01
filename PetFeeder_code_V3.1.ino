@@ -484,7 +484,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<button type='submit' class='btn primary'>💾 Enregistrer</button>"
          "<a class='btn adv' style='display:none' href='/backup'>📤 Exporter config</a>"
          "<button type='button' id='btnImportCfg' class='btn adv' style='display:none'>📥 Importer config…</button>"
-         "<input type='file' id='fres_settings' class='adv' style='display:none' accept='application/json'>"
+         "<input type='file' id='fres_settings' style='display:none' accept='application/json'>"
          "</div></section>");
 
   h += F("</form>");
