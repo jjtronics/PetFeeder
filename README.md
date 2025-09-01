@@ -7,9 +7,9 @@
 ## English
 
 ### Overview
-PetFeeder is an open-source firmware to retrofit stepper-based pet feeders with Wi-Fi connectivity for any animal that eats kibble.
-It started as a replacement for the analog electronics of the paid [PEDRO feeder by Manutechlab](https://ko-fi.com/s/698e04b7e3)
-([YouTube video](https://www.youtube.com/watch?v=Uv0lsih8JRA)), which originally uses two potentiometers and no networking.
+PetFeeder is an open-source firmware to retrofit stepper-based pet feeders (auger type) with Wi-Fi connectivity for any animal that eats kibble.
+It was born from the need to network-enable the paid [PEDRO feeder by Manutechlab](https://ko-fi.com/s/698e04b7e3)
+([YouTube video](https://www.youtube.com/watch?v=Uv0lsih8JRA)), which adjusts with two potentiometers and lacks connectivity.
 While our build uses the PEDRO mechanical kit, the ESP8266 + A4988 setup can drive any dispenser based on a NEMA17 or similar stepper motor.
 It offers a modern web interface, daily schedule, OTA updates and optional MQTT/webhook integrations.
 
@@ -80,8 +80,8 @@ This project is released under the MIT License. See [LICENSE](LICENSE).
 ## Français
 
 ### Aperçu
-PetFeeder est un firmware open-source pour connecter des distributeurs de croquettes pour animaux à moteur pas-à-pas via le Wi-Fi.
-Il est né du besoin de remplacer l'électronique analogique du projet payant [PEDRO de Manutechlab](https://ko-fi.com/s/698e04b7e3)
+PetFeeder est un firmware open-source pour connecter des distributeurs de croquettes pour animaux à moteur pas-à-pas (type vis sans fin) via le Wi-Fi.
+Il est né du besoin de rendre connecté le projet payant [PEDRO de Manutechlab](https://ko-fi.com/s/698e04b7e3)
 ([vidéo YouTube](https://www.youtube.com/watch?v=Uv0lsih8JRA)) qui se règle avec deux potentiomètres et n'est pas connecté.
 Même si les exemples utilisent le kit mécanique PEDRO, ce firmware peut rendre connecté n'importe quel distributeur basé sur un moteur NEMA17 ou équivalent.
 Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook facultatives.
