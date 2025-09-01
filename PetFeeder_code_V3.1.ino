@@ -1,6 +1,6 @@
 /*
  * ============================================================
- *  PetFeeder - ESP8266 + A4988  (Cat Feeder Wi-Fi / OTA / Web UI)
+ *  PetFeeder - ESP8266 + A4988  (Pet feeder Wi-Fi / OTA / Web UI)
  *  -> Planning journalier + Page Paramètres (gear icon)
  * ============================================================
  *
