@@ -233,8 +233,8 @@ String commonHeaderHTML(const String& title,const String& host){
   h += F("<div class='actions'>"
          "<a class='icon' href='/' title='Accueil'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M10 19v-5h4v5h5v-8h3L12 3 2 11h3v8z'/></svg></a>"
          "<a class='icon' href='/settings' title='Paramètres'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M19.14,12.94a7.48,7.48,0,0,0,.05-1l2.11-1.65a.5.5,0,0,0,.12-.64l-2-3.46a.5.5,0,0,0-.6-.22l-2.49,1a7.09,7.09,0,0,0-1.73-1l-.38-2.65A.5.5,0,0,0,13.72,3H10.28a.5.5,0,1,1-.49.41L9.41,6.06a7.09,7.09,0,0,0-1.73,1l-2.49-1a.5.5,0,0,0-.6.22l-2,3.46a.5.5,0,0,0,.12.64L4.86,11a7.48,7.48,0,0,0,0,2l-2.11,1.65a.5.5,0,0,0-.12.64l2,3.46a.5.5,0,0,0,.6.22l2.49,1a7.09,7.09,0,0,0,1.73,1l.38,2.65a.5.5,0,0,0,.49.41h3.44a.5.5,0,0,0,.49-.41l.38-2.65a.5.5,0,0,0,.6-.22l2-3.46a.5.5,0,0,0,.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z'/></svg></a>"
-         "<a class='icon' href='/logs' title='Logs'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z'/></svg></a>"
-         "<a class='icon' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
+         "<a class='icon adv' style='display:none' href='/logs' title='Logs'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z'/></svg></a>"
+         "<a class='icon adv' style='display:none' href='/update' title='Mise à jour'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3v10.55A4 4 0 1 0 14 17V7h4l-6-6-6 6z'/></svg></a>"
          "<button id='theme' class='icon' title='Basculer thème' aria-label='Thème'><svg width='20' height='20' viewBox='0 0 24 24'><path d='M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm7.07 2.93a1 1 0 0 1 0 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7a1 1 0 0 1 1.41 0zM21 11a1 1 0 1 1 0 2h-1a1 1 0 1 1 0-2h1zM6.05 5.34a1 1 0 0 1 1.41 0l.7.7A1 1 0 0 1 6.75 7.46l-.7-.7a1 1 0 0 1 0-1.42zM12 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM4 11a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2h1zm1.64 7.36a1 1 0 0 1 1.41 0l.7.7a1 1 0 1 1-1.41 1.41l-.7-.7a1 1 0 0 1 0-1.41zm12.02 0a1 1 0 0 1 1.41 1.41l-.7.7a1 1 0 1 1-1.41-1.41l.7-.7z'/></svg></button>"
          "</div>"
          "<div style='flex-basis:100%;display:flex;justify-content:flex-start;margin-top:8px'>"
@@ -363,6 +363,7 @@ String htmlIndex(const String& host){
          "document.addEventListener('DOMContentLoaded',()=>{try{"
          "const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);"
          "const root=document.documentElement;"
+         "const isExpert=localStorage.getItem('pf_expert')==='1'; document.querySelectorAll('.adv').forEach(e=>e.style.display=isExpert?'':'none');"
          "function applyTheme(t){ if(t==='light'){root.classList.add('light');} else {root.classList.remove('light');} localStorage.setItem('pf_theme',t);} "
          "applyTheme(localStorage.getItem('pf_theme')||'dark');"
          "const themeBtn=$('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light');"
@@ -527,7 +528,7 @@ String htmlLogsPage(){
   h += content;
   h += F("</pre></section></main>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
+         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;document.querySelectorAll('.adv').forEach(e=>e.style.display=localStorage.getItem('pf_expert')==='1'?'':'none');function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
 }
@@ -548,7 +549,7 @@ String htmlUpdatePage(const String& msg){
   if(msg.length()){ h += "<p>"+msg+"</p>"; }
   h += F("</section></main>"
          "<script>"
-         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
+         "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;document.querySelectorAll('.adv').forEach(e=>e.style.display=localStorage.getItem('pf_expert')==='1'?'':'none');function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
 }
@@ -581,7 +582,9 @@ void handleSettingsPost(){
   String oldTz   = String(cfg.tz);
 
   if(server.hasArg("device_name")) { strlcpy(cfg.device_name, server.arg("device_name").c_str(), sizeof(cfg.device_name)); }
-  if(server.hasArg("ota_pass"))    { strlcpy(cfg.ota_pass,    server.arg("ota_pass").c_str(),    sizeof(cfg.ota_pass)); }
+  if(server.hasArg("ota_pass") && server.arg("ota_pass").length()>0){
+    strlcpy(cfg.ota_pass, server.arg("ota_pass").c_str(), sizeof(cfg.ota_pass));
+  }
 
   if(server.hasArg("tz_adv") && server.arg("tz_adv").length()>0){
     strlcpy(cfg.tz, server.arg("tz_adv").c_str(), sizeof(cfg.tz));
