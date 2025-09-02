@@ -1,6 +1,6 @@
 # PetFeeder
 
-[Français](#français) | [English](#english)
+<a href="#français" target="_blank">Français</a> | <a href="#english" target="_blank">English</a>
 
 ---
 
@@ -8,8 +8,8 @@
 
 ### Overview
 PetFeeder is an open-source firmware to retrofit stepper-based pet feeders (auger type) with Wi-Fi connectivity for any animal that eats kibble.
-It was born from the need to network-enable the paid [PEDRO feeder by Manutechlab](https://ko-fi.com/s/698e04b7e3)
-([YouTube video](https://www.youtube.com/watch?v=Uv0lsih8JRA)), which adjusts with two potentiometers and lacks connectivity.
+It was born from the need to network-enable the paid <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO feeder by Manutechlab</a>
+(<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>), which adjusts with two potentiometers and lacks connectivity.
 While our build uses the PEDRO mechanical kit, the ESP8266 + A4988 setup can drive any dispenser based on a NEMA17 or similar stepper motor.
 It offers a modern web interface, daily schedule, OTA updates and optional MQTT/webhook integrations.
 
@@ -32,8 +32,8 @@ It offers a modern web interface, daily schedule, OTA updates and optional MQTT/
 - NEMA17 stepper motor
 - 12 V power supply + 100–220 µF capacitor
 - Push button between D2 and GND
-- 3D printed parts from the paid [PEDRO project by Manutechlab](https://ko-fi.com/s/698e04b7e3)
-  ([YouTube video](https://www.youtube.com/watch?v=Uv0lsih8JRA)); any NEMA17‑based feeder can be adapted
+- 3D printed parts from the paid <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO project by Manutechlab</a>
+  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>); any NEMA17‑based feeder can be adapted
 
 ### Wiring
 | Wemos D1 mini | A4988 | Notes |
@@ -54,13 +54,21 @@ Motor coils (NEMA17 17HE12‑1204S example):
 ![Wiring diagram](docs/images/wiring.png)
 
 ### Software Setup
-1. Install [Arduino IDE](https://www.arduino.cc/en/software) or `arduino-cli` with ESP8266 board package.
+1. Install <a href="https://www.arduino.cc/en/software" target="_blank">Arduino IDE</a> or `arduino-cli` with ESP8266 board package.
 2. Open `PetFeeder_code_V3.1.ino` and select **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
 3. Flash the board. On first boot the access point `<device_name>-SETUP` will appear.
 4. Connect and configure Wi‑Fi credentials, timezone, quotas, etc.
 
-*Insert a screenshot of the web interface here*
-![Web UI](docs/images/web-ui.png)
+Below are screenshots of the web interface:
+
+![1](docs/images/web-ui_1.png)
+![2](docs/images/web-ui_2.png)
+![3](docs/images/web-ui_3.png)
+![4](docs/images/web-ui_4.png)
+![5](docs/images/web-ui_5.png)
+![6](docs/images/web-ui_6.png)
+![7](docs/images/web-ui_7.png)
+![8](docs/images/web-ui_8.png)
 
 ### API & MQTT
 - `GET /status` – JSON state
@@ -73,7 +81,7 @@ Motor coils (NEMA17 17HE12‑1204S example):
 Mechanical design derived from the PEDRO project by Manutechlab. Electronics and firmware rewritten for ESP8266 connectivity.
 
 ### License
-This project is released under the MIT License. See [LICENSE](LICENSE).
+This project is released under the MIT License. See <a href="LICENSE" target="_blank">LICENSE</a>.
 
 ---
 
@@ -81,8 +89,8 @@ This project is released under the MIT License. See [LICENSE](LICENSE).
 
 ### Aperçu
 PetFeeder est un firmware open-source pour connecter des distributeurs de croquettes pour animaux à moteur pas-à-pas (type vis sans fin) via le Wi-Fi.
-Il est né du besoin de rendre connecté le projet payant [PEDRO de Manutechlab](https://ko-fi.com/s/698e04b7e3)
-([vidéo YouTube](https://www.youtube.com/watch?v=Uv0lsih8JRA)) qui se règle avec deux potentiomètres et n'est pas connecté.
+Il est né du besoin de rendre connecté le projet payant <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO de Manutechlab</a>
+(<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">vidéo YouTube</a>) qui se règle avec deux potentiomètres et n'est pas connecté.
 Même si les exemples utilisent le kit mécanique PEDRO, ce firmware peut rendre connecté n'importe quel distributeur basé sur un moteur NEMA17 ou équivalent.
 Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook facultatives.
 
@@ -105,8 +113,8 @@ Il propose une interface web moderne, un planning journalier, des mises à jour 
 - Moteur pas‑à‑pas NEMA17
 - Alimentation 12 V + condensateur 100–220 µF
 - Bouton poussoir entre D2 et GND
-- Pièces imprimées en 3D : projet payant [PEDRO de Manutechlab](https://ko-fi.com/s/698e04b7e3)
-  ([vidéo YouTube](https://www.youtube.com/watch?v=Uv0lsih8JRA)) ; tout distributeur à moteur NEMA17 peut être adapté
+- Pièces imprimées en 3D : projet payant <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO de Manutechlab</a>
+  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">vidéo YouTube</a>) ; tout distributeur à moteur NEMA17 peut être adapté
 
 ### Câblage
 | Wemos D1 mini | A4988 | Notes |
@@ -127,13 +135,21 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 ![Schéma de câblage](docs/images/wiring.png)
 
 ### Mise en route
-1. Installer l'[IDE Arduino](https://www.arduino.cc/en/software) ou `arduino-cli` avec la carte ESP8266.
+1. Installer l'<a href="https://www.arduino.cc/en/software" target="_blank">IDE Arduino</a> ou `arduino-cli` avec la carte ESP8266.
 2. Ouvrir `PetFeeder_code_V3.1.ino` et choisir **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
 3. Téléverser le firmware. Au premier démarrage, le point d'accès `<device_name>-SETUP` apparaît.
 4. S'y connecter pour configurer le Wi‑Fi, le fuseau horaire, les quotas, etc.
 
-*Insérer ici une capture d’écran de l’interface*
-![Interface web](docs/images/web-ui.png)
+Voici quelques captures d’écran de l’interface :
+
+![1](docs/images/web-ui_1.png)
+![2](docs/images/web-ui_2.png)
+![3](docs/images/web-ui_3.png)
+![4](docs/images/web-ui_4.png)
+![5](docs/images/web-ui_5.png)
+![6](docs/images/web-ui_6.png)
+![7](docs/images/web-ui_7.png)
+![8](docs/images/web-ui_8.png)
 
 ### API & MQTT
 - `GET /status` – état en JSON
@@ -146,5 +162,5 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 Design mécanique dérivé du projet PEDRO de Manutechlab. Électronique et firmware réécrits pour l’ESP8266.
 
 ### Licence
-Ce projet est publié sous licence MIT. Voir [LICENSE](LICENSE).
+Ce projet est publié sous licence MIT. Voir <a href="LICENSE" target="_blank">LICENSE</a>.
 
