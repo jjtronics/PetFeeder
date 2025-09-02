@@ -13,7 +13,6 @@ It was born from the need to network-enable the paid <a href="https://ko-fi.com/
 While our build uses the PEDRO mechanical kit, the ESP8266 + A4988 setup can drive any dispenser based on a NEMA17 or similar stepper motor.
 It offers a modern web interface, daily schedule, OTA updates and optional MQTT/webhook integrations.
 
-*Insert a photo of the assembled feeder here*
 ![Assembled PetFeeder](docs/images/feeder.jpg)
 
 ### Features
@@ -50,8 +49,8 @@ Motor coils (NEMA17 17HE12‑1204S example):
 - Coil A → A4988 1A/1B: black / blue
 - Coil B → A4988 2A/2B: green / red
 
-*Insert a wiring diagram or photo here*
-![Wiring diagram](docs/images/wiring.png)
+![Schéma de câblage](docs/images/wiring-1.jpg)
+![2](docs/images/wiring-2.jpg)
 
 ### Software Setup
 1. Install <a href="https://www.arduino.cc/en/software" target="_blank">Arduino IDE</a> or `arduino-cli` with ESP8266 board package.
@@ -94,7 +93,6 @@ Il est né du besoin de rendre connecté le projet payant <a href="https://ko-fi
 Même si les exemples utilisent le kit mécanique PEDRO, ce firmware peut rendre connecté n'importe quel distributeur basé sur un moteur NEMA17 ou équivalent.
 Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook facultatives.
 
-*Insérer ici une photo du distributeur assemblé*
 ![Distributeur assemblé](docs/images/feeder.jpg)
 
 ### Fonctionnalités
@@ -131,8 +129,8 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 - Bobine A → A4988 1A/1B : noir / bleu
 - Bobine B → A4988 2A/2B : vert / rouge
 
-*Insérer ici un schéma de câblage ou une photo*
-![Schéma de câblage](docs/images/wiring.png)
+![Schéma de câblage](docs/images/wiring-1.jpg)
+![2](docs/images/wiring-2.jpg)
 
 ### Mise en route
 1. Installer l'<a href="https://www.arduino.cc/en/software" target="_blank">IDE Arduino</a> ou `arduino-cli` avec la carte ESP8266.
