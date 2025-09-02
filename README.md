@@ -61,12 +61,19 @@ Motor coils (NEMA17 17HE12‑1204S example):
 Below are screenshots of the web interface:
 
 ![1](docs/images/web-ui_1.png)
+
 ![2](docs/images/web-ui_2.png)
+
 ![3](docs/images/web-ui_3.png)
+
 ![4](docs/images/web-ui_4.png)
+
 ![5](docs/images/web-ui_5.png)
+
 ![6](docs/images/web-ui_6.png)
+
 ![7](docs/images/web-ui_7.png)
+
 ![8](docs/images/web-ui_8.png)
 
 ### API & MQTT
@@ -78,8 +85,10 @@ Below are screenshots of the web interface:
 
 ### Credits
 Mechanical design derived from the PEDRO project by Manutechlab. Electronics and firmware rewritten for ESP8266 connectivity.
+
 <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO project by Manutechlab</a>
-  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>); any NEMA17‑based feeder can be adapted
+
+<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>
   
 ### License
 This project is released under the MIT License. See <a href="LICENSE" target="_blank">LICENSE</a>.
@@ -143,12 +152,19 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 Voici quelques captures d’écran de l’interface :
 
 ![1](docs/images/web-ui_1.png)
+
 ![2](docs/images/web-ui_2.png)
+
 ![3](docs/images/web-ui_3.png)
+
 ![4](docs/images/web-ui_4.png)
+
 ![5](docs/images/web-ui_5.png)
+
 ![6](docs/images/web-ui_6.png)
+
 ![7](docs/images/web-ui_7.png)
+
 ![8](docs/images/web-ui_8.png)
 
 ### API & MQTT
@@ -160,8 +176,10 @@ Voici quelques captures d’écran de l’interface :
 
 ### Remerciements
 Design mécanique dérivé du projet PEDRO de Manutechlab. Électronique et firmware réécrits pour l’ESP8266.
+
 <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO project by Manutechlab</a>
-  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>); any NEMA17‑based feeder can be adapted
+
+<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>
   
 ### Licence
 Ce projet est publié sous licence MIT. Voir <a href="LICENSE" target="_blank">LICENSE</a>.
