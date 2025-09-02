@@ -78,7 +78,9 @@ Below are screenshots of the web interface:
 
 ### Credits
 Mechanical design derived from the PEDRO project by Manutechlab. Electronics and firmware rewritten for ESP8266 connectivity.
-
+<a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO project by Manutechlab</a>
+  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>); any NEMA17‑based feeder can be adapted
+  
 ### License
 This project is released under the MIT License. See <a href="LICENSE" target="_blank">LICENSE</a>.
 
@@ -158,7 +160,9 @@ Voici quelques captures d’écran de l’interface :
 
 ### Remerciements
 Design mécanique dérivé du projet PEDRO de Manutechlab. Électronique et firmware réécrits pour l’ESP8266.
-
+<a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO project by Manutechlab</a>
+  (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>); any NEMA17‑based feeder can be adapted
+  
 ### Licence
 Ce projet est publié sous licence MIT. Voir <a href="LICENSE" target="_blank">LICENSE</a>.
 
