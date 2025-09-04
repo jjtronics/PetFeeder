@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
       - name: Arduino CLI config init
         run: arduino-cli config init
 
