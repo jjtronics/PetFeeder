@@ -27,6 +27,4 @@ jobs:
         run: arduino-cli core install esp8266:esp8266
 
       - name: Compile sketch
-        run: |
-          arduino-cli compile --fqbn esp8266:esp8266:generic \
-            PetFeeder_code.ino
+        run: arduino-cli compile --fqbn esp8266:esp8266:generic .

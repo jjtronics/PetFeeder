@@ -54,7 +54,7 @@ Motor coils (NEMA17 17HE12‑1204S example):
 
 ### Software Setup
 1. Install <a href="https://www.arduino.cc/en/software" target="_blank">Arduino IDE</a> or `arduino-cli` with ESP8266 board package.
-2. Open `PetFeeder_code.ino` and select **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
+2. Open `PetFeeder.ino` and select **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
 3. Flash the board. On first boot the access point `<device_name>-SETUP` will appear.
 4. Connect and configure Wi‑Fi credentials, timezone, quotas, etc.
 
@@ -145,7 +145,7 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 
 ### Mise en route
 1. Installer l'<a href="https://www.arduino.cc/en/software" target="_blank">IDE Arduino</a> ou `arduino-cli` avec la carte ESP8266.
-2. Ouvrir `PetFeeder_code.ino` et choisir **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
+2. Ouvrir `PetFeeder.ino` et choisir **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
 3. Téléverser le firmware. Au premier démarrage, le point d'accès `<device_name>-SETUP` apparaît.
 4. S'y connecter pour configurer le Wi‑Fi, le fuseau horaire, les quotas, etc.
 
