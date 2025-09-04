@@ -3,6 +3,8 @@
  *  PetFeeder - ESP8266 + A4988  (Pet feeder Wi-Fi / OTA / Web UI)
  *  -> Planning journalier + Page Paramètres (gear icon)
  * ============================================================
+ * Licensed under the MIT License. See LICENSE for details.
+ * ============================================================
  *
  * ✨ Fonctions :
  *  - WiFiManager : AP "<device_name>-SETUP" si non configuré
