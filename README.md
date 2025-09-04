@@ -54,9 +54,10 @@ Motor coils (NEMA17 17HE12‑1204S example):
 
 ### Software Setup
 1. Install <a href="https://www.arduino.cc/en/software" target="_blank">Arduino IDE</a> or `arduino-cli` with ESP8266 board package.
-2. Open `PetFeeder.ino` and select **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
-3. Flash the board. On first boot the access point `<device_name>-SETUP` will appear.
-4. Connect and configure Wi‑Fi credentials, timezone, quotas, etc.
+2. Install the libraries: WiFiManager, ArduinoJson and PubSubClient.
+3. Open `PetFeeder.ino` and select **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
+4. Flash the board. On first boot the access point `<device_name>-SETUP` will appear.
+5. Connect and configure Wi‑Fi credentials, timezone, quotas, etc.
 
 Below are screenshots of the web interface:
 
@@ -145,9 +146,10 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 
 ### Mise en route
 1. Installer l'<a href="https://www.arduino.cc/en/software" target="_blank">IDE Arduino</a> ou `arduino-cli` avec la carte ESP8266.
-2. Ouvrir `PetFeeder.ino` et choisir **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
-3. Téléverser le firmware. Au premier démarrage, le point d'accès `<device_name>-SETUP` apparaît.
-4. S'y connecter pour configurer le Wi‑Fi, le fuseau horaire, les quotas, etc.
+2. Installer les bibliothèques : WiFiManager, ArduinoJson et PubSubClient.
+3. Ouvrir `PetFeeder.ino` et choisir **ESP8266 › LOLIN(Wemos) D1 R2 & mini**.
+4. Téléverser le firmware. Au premier démarrage, le point d'accès `<device_name>-SETUP` apparaît.
+5. S'y connecter pour configurer le Wi‑Fi, le fuseau horaire, les quotas, etc.
 
 Voici quelques captures d’écran de l’interface :
 

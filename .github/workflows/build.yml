@@ -26,5 +26,8 @@ jobs:
       - name: Install ESP8266 core
         run: arduino-cli core install esp8266:esp8266
 
+      - name: Install required libraries
+        run: arduino-cli lib install WiFiManager ArduinoJson PubSubClient
+
       - name: Compile sketch
         run: arduino-cli compile --fqbn esp8266:esp8266:generic .
