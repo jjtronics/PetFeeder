@@ -1,0 +1,29 @@
+---
+name: Build
+
+on: ['push', 'pull_request']  # yamllint disable-line rule:truthy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Arduino CLI config init
+        run: arduino-cli config init
+
+      - name: Add ESP8266 board manager URL
+        run: |
+          arduino-cli config add board_manager.additional_urls \
+            https://arduino.esp8266.com/stable/package_esp8266com_index.json
+
+      - name: Update Arduino core index
+        run: arduino-cli core update-index
+
+      - name: Install ESP8266 core
+        run: arduino-cli core install esp8266:esp8266
+
+      - name: Compile sketch
+        run: |
+          arduino-cli compile --fqbn esp8266:esp8266:generic \
+            PetFeeder_code.ino
