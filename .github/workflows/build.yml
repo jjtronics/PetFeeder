@@ -1,0 +1,57 @@
+---
+name: Build firmware
+
+'on':
+  push:
+    tags:
+      - '*'
+  pull_request: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --user pipx
+          python -m pipx ensurepath
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          pipx install platformio
+
+      - name: Build firmware
+        run: pio run
+
+      - name: Find firmware binary
+        if: startsWith(github.ref, 'refs/tags/')
+        id: firmware
+        run: |
+          FIRMWARE_PATH=$(find .pio/build -name firmware.bin -print -quit)
+          if [ -z "$FIRMWARE_PATH" ]; then
+            echo "No firmware binary found" >&2
+            exit 1
+          fi
+          echo "path=$FIRMWARE_PATH" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        if: startsWith(github.ref, 'refs/tags/')
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+
+      - name: Upload firmware to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.firmware.outputs.path }}
+          asset_name: firmware.bin
+          asset_content_type: application/octet-stream
