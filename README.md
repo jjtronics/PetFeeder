@@ -61,21 +61,9 @@ Motor coils (NEMA17 17HE12‑1204S example):
 
 Below are screenshots of the web interface:
 
-![1](docs/images/web-ui_1.png)
+![1](docs/images/animation_light.gif)
 
-![2](docs/images/web-ui_2.png)
-
-![3](docs/images/web-ui_3.png)
-
-![4](docs/images/web-ui_4.png)
-
-![5](docs/images/web-ui_5.png)
-
-![6](docs/images/web-ui_6.png)
-
-![7](docs/images/web-ui_7.png)
-
-![8](docs/images/web-ui_8.png)
+![2](docs/images/animation_dark.gif)
 
 ### API & MQTT
 - `GET /status` – JSON state
@@ -153,21 +141,9 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 
 Voici quelques captures d’écran de l’interface :
 
-![1](docs/images/web-ui_1.png)
+![1](docs/images/animation_light.gif)
 
-![2](docs/images/web-ui_2.png)
-
-![3](docs/images/web-ui_3.png)
-
-![4](docs/images/web-ui_4.png)
-
-![5](docs/images/web-ui_5.png)
-
-![6](docs/images/web-ui_6.png)
-
-![7](docs/images/web-ui_7.png)
-
-![8](docs/images/web-ui_8.png)
+![2](docs/images/animation_dark.gif)
 
 ### API & MQTT
 - `GET /status` – état en JSON
