@@ -503,6 +503,8 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "<div class='switchRow'><label>Mode expert</label><input type='checkbox' id='expertToggle'></div>"
          "</section>");
 
+  h += F("<section class='card'><div><label>Version firmware</label><input value='v" FW_VERSION "' readonly></div></section>");
+
   h += F("<section class='card'><div class='actions-grid'>"
          "<button type='submit' class='btn primary'>💾 Enregistrer</button>"
          "<a class='btn adv' style='display:none' href='/backup'>📤 Exporter config</a>"
