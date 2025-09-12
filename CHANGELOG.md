@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 - Slack webhook notifications on feed events.
+- Prevent compiler crash by casting 16-bit values when saving JSON.
 
 ## v4.0
 - Initial open-source release with Wi-Fi configuration portal and responsive web interface.
