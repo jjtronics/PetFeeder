@@ -66,6 +66,13 @@ Below are screenshots of the web interface:
 
 ![2](docs/images/animation_dark.gif)
 
+### Release process
+1. Increment `FW_VERSION` in `PetFeeder.ino`.
+2. Add a new entry to `CHANGELOG.md` describing the changes.
+3. Commit the modifications.
+4. Tag the commit (e.g. `git tag vX.Y && git push origin vX.Y`).
+5. Publish the GitHub release for the tag to run the release workflow and attach the firmware binary.
+
 ### API & MQTT
 - `GET /status` – JSON state
 - `GET /feed?n=1` – dispense `n` rations
@@ -146,6 +153,13 @@ Voici quelques captures d’écran de l’interface :
 ![1](docs/images/animation_light.gif)
 
 ![2](docs/images/animation_dark.gif)
+
+### Processus de release
+1. Incrémenter `FW_VERSION` dans `PetFeeder.ino`.
+2. Mettre à jour `CHANGELOG.md` avec les nouveautés.
+3. Commiter les modifications.
+4. Créer puis pousser le tag Git correspondant : `git tag vX.Y && git push origin vX.Y`.
+5. Publier la release GitHub associée pour déclencher le workflow et joindre le binaire du firmware.
 
 ### API & MQTT
 - `GET /status` – état en JSON
