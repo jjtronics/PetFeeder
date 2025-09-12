@@ -63,6 +63,7 @@
 #include <PubSubClient.h>
 #include <Updater.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <FS.h>
 
 #define FW_VERSION "4.0.0"
@@ -249,8 +250,10 @@ void mqttCallback(char* topic,byte* payload,unsigned int len){
 void mqttPublish(const String& sub,const String& val){ if(!cfg.mqtt_enable||!mqtt.connected()) return; String t=String(cfg.mqtt_topic)+"/"+sub; mqtt.publish(t.c_str(),val.c_str(),true); }
 void webhookEvent(const String& type,const String& msg){
   if(strlen(cfg.webhook_url)==0) return;
+  BearSSL::WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
-  if(http.begin(cfg.webhook_url)){
+  if(http.begin(client, cfg.webhook_url)){
     http.addHeader("Content-Type","application/json");
     String payload = String("{\"channel\":\"") + cfg.webhook_room + "\",\"text\":\"" + type + ": " + msg + "\"}";
     http.POST(payload);
