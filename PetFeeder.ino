@@ -184,7 +184,26 @@ bool quotaAllow(uint8_t n){ if(cfg.daily_quota==0) return true; return (rationsT
 
 // ---------- MQTT / WEBHOOK ----------
 void mqttReconnect(){ if(!cfg.mqtt_enable) return; if(mqtt.connected()) return; if(strlen(cfg.mqtt_host)==0) return; mqtt.setServer(cfg.mqtt_host,cfg.mqtt_port); String cid=hostName+"-"+String(ESP.getChipId(),HEX); if(strlen(cfg.mqtt_user)>0){ mqtt.connect(cid.c_str(),cfg.mqtt_user,cfg.mqtt_pass); } else { mqtt.connect(cid.c_str()); } if(mqtt.connected()){ String t = String(cfg.mqtt_topic)+"/cmd/#"; mqtt.subscribe(t.c_str()); } }
-void mqttCallback(char* topic,byte* payload,unsigned int len){ String t(topic); String p; p.reserve(len+1); for(unsigned int i=0;i<len;i++) p+=(char)payload[i]; if(t.endsWith("/cmd/feed")){ long v=p.toInt(); if(v<1)v=1; if(v>20)v=20; if(quotaAllow((uint8_t)v) && !cfg.safe_mode) feedRations((uint8_t)v); } else if(t.endsWith("/cmd/unclog")){ unclog(); } else if(t.endsWith("/cmd/safe")){ cfg.safe_mode=(p=="1"||p=="on"||p=="true"); saveConfig(); } }
+void mqttCallback(char* topic,byte* payload,unsigned int len){
+  if(topic==nullptr || payload==nullptr) return;
+  String t(topic);
+  String p;
+  if(len>0){
+    p.reserve(len+1);
+    for(unsigned int i=0;i<len;i++) p+=(char)payload[i];
+  }
+  if(t.endsWith("/cmd/feed")){
+    long v=p.toInt();
+    if(v<1)v=1;
+    if(v>20)v=20;
+    if(quotaAllow((uint8_t)v) && !cfg.safe_mode) feedRations((uint8_t)v);
+  } else if(t.endsWith("/cmd/unclog")){
+    unclog();
+  } else if(t.endsWith("/cmd/safe")){
+    cfg.safe_mode=(p=="1"||p=="on"||p=="true");
+    saveConfig();
+  }
+}
 void mqttPublish(const String& sub,const String& val){ if(!cfg.mqtt_enable||!mqtt.connected()) return; String t=String(cfg.mqtt_topic)+"/"+sub; mqtt.publish(t.c_str(),val.c_str(),true); }
 void webhookEvent(const String&,const String&){ /* optionnel */ }
 
