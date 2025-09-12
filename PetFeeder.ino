@@ -64,6 +64,8 @@
 #include <Updater.h>
 #include <FS.h>
 
+#define FW_VERSION "1.0"
+
 // ---------- PINS ----------
 #define PIN_DIR   14  // D5
 #define PIN_STEP  12  // D6
@@ -810,7 +812,7 @@ void setup(){
   server.begin();
   attachInterrupt(digitalPinToInterrupt(PIN_BTN), btnISR, CHANGE);
 
-  logEvent(LOG_INFO,"BOOT","host="+hostName+" v4.0");
+  logEvent(LOG_INFO,"BOOT","host="+hostName+" v" FW_VERSION);
 }
 
 void loop(){
