@@ -12,6 +12,7 @@ It was born from the need to network-enable the paid <a href="https://ko-fi.com/
 (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>), which adjusts with two potentiometers and lacks connectivity.
 While our build uses the PEDRO mechanical kit, the ESP8266 + A4988 setup can drive any dispenser based on a NEMA17 or similar stepper motor.
 It offers a modern web interface, daily schedule, OTA updates and optional MQTT/webhook integrations.
+See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ![Assembled PetFeeder](docs/images/feeder.jpg)
 
@@ -92,6 +93,7 @@ Il est né du besoin de rendre connecté le projet payant <a href="https://ko-fi
 (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">vidéo YouTube</a>) qui se règle avec deux potentiomètres et n'est pas connecté.
 Même si les exemples utilisent le kit mécanique PEDRO, ce firmware peut rendre connecté n'importe quel distributeur basé sur un moteur NEMA17 ou équivalent.
 Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook facultatives.
+Voir le [CHANGELOG](CHANGELOG.md) pour les notes de version.
 
 ![Distributeur assemblé](docs/images/feeder.jpg)
 
