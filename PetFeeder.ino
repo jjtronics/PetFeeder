@@ -57,7 +57,6 @@
 #include <WiFiManager.h>
 #include <ArduinoOTA.h>
 #include <ESP8266mDNS.h>
-#include <WiFiClientSecure.h>
 #include <LittleFS.h>
 #include <time.h>
 #include <ArduinoJson.h>
@@ -250,10 +249,8 @@ void mqttCallback(char* topic,byte* payload,unsigned int len){
 void mqttPublish(const String& sub,const String& val){ if(!cfg.mqtt_enable||!mqtt.connected()) return; String t=String(cfg.mqtt_topic)+"/"+sub; mqtt.publish(t.c_str(),val.c_str(),true); }
 void webhookEvent(const String& type,const String& msg){
   if(strlen(cfg.webhook_url)==0) return;
-  WiFiClientSecure client;
-  client.setInsecure();
   HTTPClient http;
-  if(http.begin(client, cfg.webhook_url)){
+  if(http.begin(cfg.webhook_url)){
     http.addHeader("Content-Type","application/json");
     String payload = String("{\"channel\":\"") + cfg.webhook_room + "\",\"text\":\"" + type + ": " + msg + "\"}";
     http.POST(payload);
