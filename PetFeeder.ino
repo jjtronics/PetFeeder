@@ -62,6 +62,8 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <Updater.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <FS.h>
 
 #define FW_VERSION "4.0.0"
@@ -124,6 +126,7 @@ struct Config {
   char     mqtt_user[32]   = "";
   char     mqtt_pass[32]   = "";
   char     webhook_url[128]= "";
+  char     webhook_room[32]= "";
 } cfg;
 
 // ---------- UTILS ----------
@@ -147,7 +150,19 @@ void logEvent(uint8_t level,const String& tag,const String& msg){
 // ---------- STATS ----------
 void statsSave(); void statsEnsureToday();
 void statsLoad(){ statCount=0; if(!LittleFS.exists(STATS_PATH)) return; File f=LittleFS.open(STATS_PATH,"r"); if(!f) return; StaticJsonDocument<2048> d; if(deserializeJson(d,f)){ f.close(); return; } f.close(); JsonArray a=d["days"].as<JsonArray>(); if(a.isNull()) return; for(JsonObject o:a){ if(statCount>=7) break; const char* dt=o["d"]|"0000-00-00"; uint16_t r=(uint16_t)(o["r"]|0); strncpy(last7[statCount].date,dt,sizeof(last7[statCount].date)); last7[statCount].date[10]='\0'; last7[statCount].r=r; statCount++; } }
-void statsSave(){ StaticJsonDocument<2048> d; JsonArray a=d.createNestedArray("days"); for(uint8_t i=0;i<statCount;i++){ JsonObject o=a.createNestedObject(); o["d"]=last7[i].date; o["r"]=last7[i].r; } File f=LittleFS.open(STATS_PATH,"w"); if(!f) return; serializeJson(d,f); f.close(); }
+void statsSave(){
+  StaticJsonDocument<2048> d;
+  JsonArray a = d.createNestedArray("days");
+  for(uint8_t i=0;i<statCount;i++){
+    JsonObject o = a.createNestedObject();
+    o["d"] = last7[i].date;
+    o["r"] = static_cast<uint32_t>(last7[i].r);
+  }
+  File f = LittleFS.open(STATS_PATH,"w");
+  if(!f) return;
+  serializeJson(d,f);
+  f.close();
+}
 void statsEnsureToday(){ String today=formatDate(time(nullptr)); for(uint8_t i=0;i<statCount;i++){ if(today.equals(last7[i].date)) return; } if(statCount<7){ strncpy(last7[statCount].date,today.c_str(),sizeof(last7[statCount].date)); last7[statCount].date[10]='\0'; last7[statCount].r=0; statCount++; statsSave(); return; } for(uint8_t i=1;i<7;i++) last7[i-1]=last7[i]; strncpy(last7[6].date,today.c_str(),sizeof(last7[6].date)); last7[6].date[10]='\0'; last7[6].r=0; statsSave(); }
 void statsAdd(uint16_t r){ statsEnsureToday(); String today=formatDate(time(nullptr)); for(uint8_t i=0;i<statCount;i++){ if(today.equals(last7[i].date)){ last7[i].r += r; break; } } statsSave(); }
 
@@ -161,8 +176,36 @@ bool scheduleSave(){ StaticJsonDocument<4096> d; JsonArray a=d.createNestedArray
 bool scheduleLoad(){ scheduleCount=0; for(uint8_t i=0;i<MAX_EVENTS;i++){ lastRunYDay[i]=0xFFFF; lastRunMinute[i]=0xFFFF; } if(!LittleFS.exists(SCHED_PATH)) return true; File f=LittleFS.open(SCHED_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; JsonArray a=d["events"].as<JsonArray>(); if(a.isNull()) return true; for(JsonObject o:a){ if(scheduleCount>=MAX_EVENTS) break; uint8_t hh=(uint8_t)(o["hour"]|0), mm=(uint8_t)(o["minute"]|0), rr=(uint8_t)(o["rations"]|1), dd=(uint8_t)(o["days"]|0x7F); if(hh<24&&mm<60&&rr>=1) scheduleList[scheduleCount++]={hh,mm,rr,dd}; } scheduleSort(); return true; }
 
 // ---------- CONFIG FILE ----------
-bool loadConfig(){ if(!LittleFS.exists(CFG_PATH)) return false; File f=LittleFS.open(CFG_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; strlcpy(cfg.device_name, d["device_name"]|"PetFeeder", sizeof(cfg.device_name)); strlcpy(cfg.ota_pass, d["ota_pass"]|"croquettes", sizeof(cfg.ota_pass)); strlcpy(cfg.tz, d["tz"]|"CET-1CEST,M3.5.0,M10.5.0/3", sizeof(cfg.tz)); cfg.portion_steps=(uint16_t)(d["portion_steps"]|200); cfg.step_us_slow=(uint16_t)(d["step_us_slow"]|1200); cfg.step_us_fast=(uint16_t)(d["step_us_fast"]|600); cfg.ramp_steps=(uint16_t)(d["ramp_steps"]|120); cfg.dir_invert=d["dir_invert"]|false; cfg.hold_enable=d["hold_enable"]|true; cfg.safe_mode=d["safe_mode"]|false; cfg.daily_quota=(uint8_t)(d["daily_quota"]|0); cfg.logs_enable=d["logs_enable"]|true; cfg.log_level=(uint8_t)(d["log_level"]|1); cfg.mqtt_enable=d["mqtt_enable"]|false; strlcpy(cfg.mqtt_host, d["mqtt_host"]|"", sizeof(cfg.mqtt_host)); cfg.mqtt_port=(uint16_t)(d["mqtt_port"]|1883); strlcpy(cfg.mqtt_topic, d["mqtt_topic"]|"petfeeder", sizeof(cfg.mqtt_topic)); strlcpy(cfg.mqtt_user, d["mqtt_user"]|"", sizeof(cfg.mqtt_user)); strlcpy(cfg.mqtt_pass, d["mqtt_pass"]|"", sizeof(cfg.mqtt_pass)); strlcpy(cfg.webhook_url, d["webhook_url"]|"", sizeof(cfg.webhook_url)); return true; }
-bool saveConfig(){ StaticJsonDocument<4096> d; d["device_name"]=cfg.device_name; d["ota_pass"]=cfg.ota_pass; d["tz"]=cfg.tz; d["portion_steps"]=cfg.portion_steps; d["step_us_slow"]=cfg.step_us_slow; d["step_us_fast"]=cfg.step_us_fast; d["ramp_steps"]=cfg.ramp_steps; d["dir_invert"]=cfg.dir_invert; d["hold_enable"]=cfg.hold_enable; d["safe_mode"]=cfg.safe_mode; d["daily_quota"]=cfg.daily_quota; d["logs_enable"]=cfg.logs_enable; d["log_level"]=cfg.log_level; d["mqtt_enable"]=cfg.mqtt_enable; d["mqtt_host"]=cfg.mqtt_host; d["mqtt_port"]=cfg.mqtt_port; d["mqtt_topic"]=cfg.mqtt_topic; d["mqtt_user"]=cfg.mqtt_user; d["mqtt_pass"]=cfg.mqtt_pass; d["webhook_url"]=cfg.webhook_url; File f=LittleFS.open(CFG_PATH,"w"); if(!f) return false; bool ok=serializeJson(d,f)>0; f.close(); return ok; }
+bool loadConfig(){ if(!LittleFS.exists(CFG_PATH)) return false; File f=LittleFS.open(CFG_PATH,"r"); if(!f) return false; StaticJsonDocument<4096> d; DeserializationError e=deserializeJson(d,f); f.close(); if(e) return false; strlcpy(cfg.device_name, d["device_name"]|"PetFeeder", sizeof(cfg.device_name)); strlcpy(cfg.ota_pass, d["ota_pass"]|"croquettes", sizeof(cfg.ota_pass)); strlcpy(cfg.tz, d["tz"]|"CET-1CEST,M3.5.0,M10.5.0/3", sizeof(cfg.tz)); cfg.portion_steps=(uint16_t)(d["portion_steps"]|200); cfg.step_us_slow=(uint16_t)(d["step_us_slow"]|1200); cfg.step_us_fast=(uint16_t)(d["step_us_fast"]|600); cfg.ramp_steps=(uint16_t)(d["ramp_steps"]|120); cfg.dir_invert=d["dir_invert"]|false; cfg.hold_enable=d["hold_enable"]|true; cfg.safe_mode=d["safe_mode"]|false; cfg.daily_quota=(uint8_t)(d["daily_quota"]|0); cfg.logs_enable=d["logs_enable"]|true; cfg.log_level=(uint8_t)(d["log_level"]|1); cfg.mqtt_enable=d["mqtt_enable"]|false; strlcpy(cfg.mqtt_host, d["mqtt_host"]|"", sizeof(cfg.mqtt_host)); cfg.mqtt_port=(uint16_t)(d["mqtt_port"]|1883); strlcpy(cfg.mqtt_topic, d["mqtt_topic"]|"petfeeder", sizeof(cfg.mqtt_topic)); strlcpy(cfg.mqtt_user, d["mqtt_user"]|"", sizeof(cfg.mqtt_user)); strlcpy(cfg.mqtt_pass, d["mqtt_pass"]|"", sizeof(cfg.mqtt_pass)); strlcpy(cfg.webhook_url, d["webhook_url"]|"", sizeof(cfg.webhook_url)); strlcpy(cfg.webhook_room, d["webhook_room"]|"", sizeof(cfg.webhook_room)); return true; }
+bool saveConfig(){
+  StaticJsonDocument<4096> d;
+  d["device_name"] = cfg.device_name;
+  d["ota_pass"] = cfg.ota_pass;
+  d["tz"] = cfg.tz;
+  d["portion_steps"] = static_cast<uint32_t>(cfg.portion_steps);
+  d["step_us_slow"] = static_cast<uint32_t>(cfg.step_us_slow);
+  d["step_us_fast"] = static_cast<uint32_t>(cfg.step_us_fast);
+  d["ramp_steps"] = static_cast<uint32_t>(cfg.ramp_steps);
+  d["dir_invert"] = cfg.dir_invert;
+  d["hold_enable"] = cfg.hold_enable;
+  d["safe_mode"] = cfg.safe_mode;
+  d["daily_quota"] = cfg.daily_quota;
+  d["logs_enable"] = cfg.logs_enable;
+  d["log_level"] = cfg.log_level;
+  d["mqtt_enable"] = cfg.mqtt_enable;
+  d["mqtt_host"] = cfg.mqtt_host;
+  d["mqtt_port"] = static_cast<uint32_t>(cfg.mqtt_port);
+  d["mqtt_topic"] = cfg.mqtt_topic;
+  d["mqtt_user"] = cfg.mqtt_user;
+  d["mqtt_pass"] = cfg.mqtt_pass;
+  d["webhook_url"] = cfg.webhook_url;
+  d["webhook_room"] = cfg.webhook_room;
+  File f = LittleFS.open(CFG_PATH,"w");
+  if(!f) return false;
+  bool ok = serializeJson(d,f) > 0;
+  f.close();
+  return ok;
+}
 
 // ---------- MOTOR ----------
 void driverEnable(bool on){ digitalWrite(PIN_EN, on?LOW:HIGH); }
@@ -176,7 +219,7 @@ void stepperRun(int32_t steps,bool dir,uint16_t usSlow,uint16_t usFast,uint16_t 
   for(uint32_t i=0;i<ramp;i++){ uint16_t us=usFast + ((uint32_t)(usSlow-usFast)*i)/ramp; stepPulse(us); }
   if(!cfg.hold_enable) driverEnable(false);
 }
-void feedRations(uint8_t n){ if(n<1)n=1; if(cfg.safe_mode) return; uint32_t total=(uint32_t)cfg.portion_steps*n; bool dir=cfg.dir_invert?false:true; stepperRun(total,dir,cfg.step_us_slow,cfg.step_us_fast,cfg.ramp_steps); rationsToday+=n; statsAdd(n); logEvent(LOG_INFO,"FEED","dispense x"+String(n)); }
+void feedRations(uint8_t n){ if(n<1)n=1; if(cfg.safe_mode) return; uint32_t total=(uint32_t)cfg.portion_steps*n; bool dir=cfg.dir_invert?false:true; stepperRun(total,dir,cfg.step_us_slow,cfg.step_us_fast,cfg.ramp_steps); rationsToday+=n; statsAdd(n); logEvent(LOG_INFO,"FEED","dispense x"+String(n)); webhookEvent("FEED", String("dispense x")+String(n)); }
 void unclog(){ uint16_t s=cfg.portion_steps/3; stepperRun(s,cfg.dir_invert,cfg.step_us_slow,cfg.step_us_fast,cfg.ramp_steps/2); delay(150); stepperRun(s,!cfg.dir_invert,cfg.step_us_slow,cfg.step_us_fast,cfg.ramp_steps/2); delay(150); stepperRun(s,cfg.dir_invert,cfg.step_us_slow,cfg.step_us_fast,cfg.ramp_steps/2); logEvent(LOG_INFO,"UNCLOG","done"); }
 
 // ---------- QUOTA ----------
@@ -205,7 +248,18 @@ void mqttCallback(char* topic,byte* payload,unsigned int len){
   }
 }
 void mqttPublish(const String& sub,const String& val){ if(!cfg.mqtt_enable||!mqtt.connected()) return; String t=String(cfg.mqtt_topic)+"/"+sub; mqtt.publish(t.c_str(),val.c_str(),true); }
-void webhookEvent(const String&,const String&){ /* optionnel */ }
+void webhookEvent(const String& type,const String& msg){
+  if(strlen(cfg.webhook_url)==0) return;
+  BearSSL::WiFiClientSecure client;
+  client.setInsecure();
+  HTTPClient http;
+  if(http.begin(client, cfg.webhook_url)){
+    http.addHeader("Content-Type","application/json");
+    String payload = String("{\"channel\":\"") + cfg.webhook_room + "\",\"text\":\"" + type + ": " + msg + "\"}";
+    http.POST(payload);
+    http.end();
+  }
+}
 
 // ---------- HTML DECL ----------
 String htmlIndex(const String& host);
@@ -494,6 +548,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += F("'></div><div><label>User</label><input name='mqtt_user' value='"); h+=cfg.mqtt_user;
   h += F("'></div><div><label>Password</label><input name='mqtt_pass' value='"); h+=cfg.mqtt_pass; h+=F("'></div>"
          "<div><label>Webhook URL</label><input name='webhook_url' value='"); h+=cfg.webhook_url; h+=F("'></div>"
+         "<div><label>Webhook Room</label><input name='webhook_room' value='"); h+=cfg.webhook_room; h+=F("'></div>"
          "</section>");
 
   h += F("<section class='card grid g2'>"
@@ -638,6 +693,7 @@ void handleSettingsPost(){
   if(server.hasArg("mqtt_user"))   strlcpy(cfg.mqtt_user,  server.arg("mqtt_user").c_str(),  sizeof(cfg.mqtt_user));
   if(server.hasArg("mqtt_pass"))   strlcpy(cfg.mqtt_pass,  server.arg("mqtt_pass").c_str(),  sizeof(cfg.mqtt_pass));
   if(server.hasArg("webhook_url")) strlcpy(cfg.webhook_url,server.arg("webhook_url").c_str(),sizeof(cfg.webhook_url));
+  if(server.hasArg("webhook_room")) strlcpy(cfg.webhook_room,server.arg("webhook_room").c_str(),sizeof(cfg.webhook_room));
 
   saveConfig(); logEvent(LOG_INFO,"SETTINGS","saved");
 
@@ -666,11 +722,16 @@ void handleStatus(){
 
   doc["epoch"] = (uint32_t)now;
   doc["host"] = hostName;
-  doc["device_name"]=cfg.device_name;
-  doc["daily_quota"]=cfg.daily_quota;
-  doc["rations_today"]=rationsToday;
-  doc["portion_steps"]=cfg.portion_steps; doc["step_us_slow"]=cfg.step_us_slow; doc["step_us_fast"]=cfg.step_us_fast; doc["ramp_steps"]=cfg.ramp_steps;
-  doc["dir_invert"]=cfg.dir_invert; doc["hold_enable"]=cfg.hold_enable; doc["safe_mode"]=cfg.safe_mode;
+  doc["device_name"] = cfg.device_name;
+  doc["daily_quota"] = cfg.daily_quota;
+  doc["rations_today"] = static_cast<uint32_t>(rationsToday);
+  doc["portion_steps"] = static_cast<uint32_t>(cfg.portion_steps);
+  doc["step_us_slow"] = static_cast<uint32_t>(cfg.step_us_slow);
+  doc["step_us_fast"] = static_cast<uint32_t>(cfg.step_us_fast);
+  doc["ramp_steps"] = static_cast<uint32_t>(cfg.ramp_steps);
+  doc["dir_invert"] = cfg.dir_invert;
+  doc["hold_enable"] = cfg.hold_enable;
+  doc["safe_mode"] = cfg.safe_mode;
 
   JsonArray arr=doc.createNestedArray("events");
   for(uint8_t i=0;i<scheduleCount;i++){
@@ -683,7 +744,11 @@ void handleStatus(){
     o["days"]=scheduleList[i].daysMask; o["done_today"]=doneToday; o["active_today"]=activeToday;
   }
   JsonArray s = doc.createNestedArray("stats");
-  for(uint8_t i=0;i<statCount;i++){ JsonObject o=s.createNestedObject(); o["d"]=last7[i].date; o["r"]=last7[i].r; }
+  for(uint8_t i=0;i<statCount;i++){
+    JsonObject o = s.createNestedObject();
+    o["d"] = last7[i].date;
+    o["r"] = static_cast<uint32_t>(last7[i].r);
+  }
 
   String out; serializeJson(doc,out); server.send(200,"application/json",out);
 }
@@ -851,7 +916,7 @@ void loop(){
         uint16_t m=(uint16_t)(scheduleList[i].hour*60+scheduleList[i].minute);
         if(!(lastRunYDay[i]==quotaYDayRef && lastRunMinute[i]==m)){
           uint8_t r=scheduleList[i].rations;
-          if(!cfg.safe_mode && quotaAllow(r)){ logEvent(LOG_INFO,"SCHEDULE",String("run ")+scheduleList[i].hour+":"+scheduleList[i].minute+" x"+r); webhookEvent("schedule", String("run ")+scheduleList[i].hour+":"+scheduleList[i].minute+" x"+r); feedRations(r); }
+          if(!cfg.safe_mode && quotaAllow(r)){ logEvent(LOG_INFO,"SCHEDULE",String("run ")+scheduleList[i].hour+":"+scheduleList[i].minute+" x"+r); feedRations(r); }
           else { logEvent(LOG_INFO,"SCHEDULE","blocked (SAFE/QUOTA)"); }
           lastRunYDay[i]=quotaYDayRef; lastRunMinute[i]=m;
         }

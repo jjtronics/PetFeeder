@@ -11,7 +11,7 @@ PetFeeder is an open-source firmware to retrofit stepper-based pet feeders (auge
 It was born from the need to network-enable the paid <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO feeder by Manutechlab</a>
 (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">YouTube video</a>), which adjusts with two potentiometers and lacks connectivity.
 While our build uses the PEDRO mechanical kit, the ESP8266 + A4988 setup can drive any dispenser based on a NEMA17 or similar stepper motor.
-It offers a modern web interface, daily schedule, OTA updates and optional MQTT/webhook integrations.
+It offers a modern web interface, daily schedule, OTA updates and optional MQTT/Slack webhook integrations.
 See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ![Assembled PetFeeder](docs/images/feeder.jpg)
@@ -24,7 +24,7 @@ See [CHANGELOG](CHANGELOG.md) for release notes.
 - OTA firmware updates with configurable password
 - Local JSON API endpoints
 - Physical button for feed/unclog/safe‑mode toggle
-- Optional MQTT and webhook notifications
+- Optional MQTT and Slack webhook notifications
 
 ### Hardware
 - Wemos D1 mini (ESP8266)
@@ -99,7 +99,7 @@ PetFeeder est un firmware open-source pour connecter des distributeurs de croque
 Il est né du besoin de rendre connecté le projet payant <a href="https://ko-fi.com/s/698e04b7e3" target="_blank">PEDRO de Manutechlab</a>
 (<a href="https://www.youtube.com/watch?v=Uv0lsih8JRA" target="_blank">vidéo YouTube</a>) qui se règle avec deux potentiomètres et n'est pas connecté.
 Même si les exemples utilisent le kit mécanique PEDRO, ce firmware peut rendre connecté n'importe quel distributeur basé sur un moteur NEMA17 ou équivalent.
-Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook facultatives.
+Il propose une interface web moderne, un planning journalier, des mises à jour OTA et des intégrations MQTT/webhook Slack facultatives.
 Voir le [CHANGELOG](CHANGELOG.md) pour les notes de version.
 
 ![Distributeur assemblé](docs/images/feeder.jpg)
@@ -112,7 +112,7 @@ Voir le [CHANGELOG](CHANGELOG.md) pour les notes de version.
 - Mises à jour OTA avec mot de passe configurable
 - API JSON locale
 - Bouton physique pour nourrir/débourrer/activer le mode sécurisé
-- Notifications MQTT et webhook en option
+- Notifications MQTT et webhook Slack en option
 
 ### Matériel
 - Wemos D1 mini (ESP8266)
