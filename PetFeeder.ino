@@ -242,6 +242,7 @@ String commonHeaderCSS(){
     ".toast{position:fixed;right:16px;top:16px;display:grid;gap:10px;z-index:9999}\n"
     ".toast .t{background:#111827;color:#e5e7eb;border:1px solid #2b2e45;padding:10px 14px;border-radius:12px;box-shadow:0 10px 20px rgba(0,0,0,.35)}\n"
     "svg,svg *{fill:currentColor!important;stroke:currentColor!important;stroke-width:0!important}\n"
+    "footer{text-align:center;padding:12px;color:var(--muted);font-size:13px}\n"
   ));
 }
 
@@ -264,6 +265,10 @@ String commonHeaderHTML(const String& title,const String& host){
          "<div class='pill'><svg width='16' height='16' viewBox='0 0 24 24'><path d='M12 1a11 11 0 1 0 11 11A11 11 0 0 0 12 1Zm1 11a1 1 0 0 1-1 1H7a1 1 0 1 1 0-2h4V5a1 1 0 1 1 2 0Z'/></svg><span id='nowFr'>--:--:-- --/--/----</span></div>"
          "</div></header>");
   return h;
+}
+
+String commonFooterHTML(){
+  return F("<footer>Firmware v" FW_VERSION "</footer>");
 }
 
 // ---------- HTML INDEX ----------
@@ -422,7 +427,9 @@ String htmlIndex(const String& host){
          "}catch(e){console.error(e);}});"
          "</script>");
 
-  h += F("</main></body></html>");
+  h += F("</main>");
+  h += commonFooterHTML();
+  h += F("</body></html>");
   return h;
 }
 
@@ -532,7 +539,9 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
          "function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock();"
          "fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});"
          "});"
-         "</script></main></body></html>");
+          "</script></main>");
+  h += commonFooterHTML();
+  h += F("</body></html>");
   (void)saved; return h;
 }
 
@@ -549,8 +558,9 @@ String htmlLogsPage(){
   h += commonHeaderHTML("📝 Logs", hostName);
   h += F("<main><section class='card'><div class='row'><a href='/logs/download' class='btn'>📥 Télécharger</a><a href='/logs/clear' class='btn'>🧹 Effacer</a></div><pre>");
   h += content;
-  h += F("</pre></section></main>"
-         "<script>"
+  h += F("</pre></section></main>");
+  h += commonFooterHTML();
+  h += F("<script>"
          "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;document.querySelectorAll('.adv').forEach(e=>e.style.display=localStorage.getItem('pf_expert')==='1'?'':'none');function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
@@ -570,8 +580,9 @@ String htmlUpdatePage(const String& msg){
          "<label>Fichier firmware (.bin)</label><input type='file' name='firmware' accept='.bin' required>"
          "<button type='submit' class='btn primary'>Téléverser</button></form>");
   if(msg.length()){ h += "<p>"+msg+"</p>"; }
-  h += F("</section></main>"
-         "<script>"
+  h += F("</section></main>");
+  h += commonFooterHTML();
+  h += F("<script>"
          "document.addEventListener('DOMContentLoaded',()=>{const root=document.documentElement;document.querySelectorAll('.adv').forEach(e=>e.style.display=localStorage.getItem('pf_expert')==='1'?'':'none');function applyTheme(t){if(t==='light'){root.classList.add('light');}else{root.classList.remove('light');} localStorage.setItem('pf_theme',t);} applyTheme(localStorage.getItem('pf_theme')||'dark');function two(n){return (n<10?'0':'')+n;} function updateClock(){const e=document.querySelector('#nowFr'); if(!e)return; const d=new Date(); e.textContent=`${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())} ${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()}`;} setInterval(updateClock,1000); updateClock(); const themeBtn=document.querySelector('#theme'); if(themeBtn) themeBtn.onclick=()=>applyTheme(root.classList.contains('light')?'dark':'light'); fetch('/status').then(r=>r.json()).then(s=>{ const qTxt=document.querySelector('#quotaTxt'); const dTxt=document.querySelector('#distTxt'); const quotaNum = s.daily_quota||0; const dist=s.rations_today||0; const quotaStr = quotaNum===0? 'illimité' : `${dist}/${quotaNum}`; if(qTxt) qTxt.textContent=quotaStr; if(dTxt) dTxt.textContent=String(dist); }).catch(()=>{});});"
          "</script></body></html>");
   return h;
