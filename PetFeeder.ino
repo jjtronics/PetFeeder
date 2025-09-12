@@ -64,7 +64,7 @@
 #include <Updater.h>
 #include <FS.h>
 
-#define FW_VERSION "1.0"
+#define FW_VERSION "4.0.0"
 
 // ---------- PINS ----------
 #define PIN_DIR   14  // D5
