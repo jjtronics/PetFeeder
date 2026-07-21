@@ -64,7 +64,9 @@
 #include <Updater.h>
 #include <FS.h>
 
-#define FW_VERSION "4.0.0"
+#define FW_VERSION "4.0.8"
+#define WIFI_MANAGER_ONLY 0
+#define WIFI_SETUP_AP_CHANNEL 6
 
 // ---------- PINS ----------
 #define PIN_DIR   14  // D5
@@ -101,6 +103,11 @@ uint8_t btnClickCount=0; bool btnPrevState=true; uint32_t btnWindowStart=0;
 
 String hostName = "petfeeder-esp8266";
 char macSuffix[5]="0000";
+WiFiEventHandler apClientConnectedHandler;
+WiFiEventHandler apClientDisconnectedHandler;
+WiFiEventHandler staConnectedHandler;
+WiFiEventHandler staDisconnectedHandler;
+WiFiEventHandler staGotIpHandler;
 
 // ---------- CONFIG ----------
 struct Config {
@@ -499,6 +506,7 @@ String htmlSettingsPage(bool saved,const String& toastMsg){
   h += F("<section class='card grid g2'>"
          "<div><a class='btn warn' href='/reboot'>⟲ Reboot</a></div>"
          "<div><a class='btn warn' href='/stats/clear'>🧹 Effacer historique 7j</a></div>"
+         "<div><a class='btn danger' href='/wifi/reset' onclick=\"return confirm('Effacer les paramètres WiFi et redémarrer en mode AP ?')\">📶 Effacer WiFi</a></div>"
          "<div><a class='btn danger' href='/factory'>🔄 Réinitialiser usine</a></div>"
          "<div class='switchRow'><label>Mode expert</label><input type='checkbox' id='expertToggle'></div>"
          "</section>");
@@ -656,6 +664,21 @@ void handleLogsClear(){ LittleFS.remove(LOG_PATH); server.sendHeader("Location",
 
 void handleStatsClear(){ LittleFS.remove(STATS_PATH); statsLoad(); statsEnsureToday(); server.sendHeader("Location","/settings?stats_cleared=1"); server.send(302,"text/plain",""); }
 
+void handleWifiReset(){
+  logEvent(LOG_INFO,"WIFI","credentials reset requested");
+  server.send(200,"text/html; charset=utf-8",
+    "<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+    "<style>body{background:#0b0b0f;color:#e7e9ee;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;display:grid;place-items:center;height:100vh;margin:0}.box{background:#15151c;border:1px solid #2b2e45;border-radius:16px;padding:24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}.hint{color:#9aa3af}</style>"
+    "<div class='box'><h2>WiFi effacé</h2><p class='hint'>Redémarrage en mode AP setup…</p><p>Reconnecte-toi au SSID <b>petfeeder-SETUP-XXXX</b>, puis ouvre <b>http://192.168.4.1</b>.</p></div>"
+  );
+  delay(300);
+  WiFi.persistent(true);
+  WiFi.disconnect(true, true);
+  delay(500);
+  WiFi.persistent(false);
+  ESP.restart();
+}
+
 void handleFactory(){ LittleFS.remove(CFG_PATH); LittleFS.remove(SCHED_PATH); LittleFS.remove(STATS_PATH); loadConfig(); scheduleLoad(); statsLoad(); statsEnsureToday(); server.sendHeader("Location","/settings?factory=1"); server.send(302,"text/plain",""); }
 
 void handleStatus(){
@@ -767,14 +790,121 @@ void applyTZ(){ setenv("TZ", cfg.tz, 1); tzset(); }
 // ---------- BUTTON ISR ----------
 void IRAM_ATTR btnISR(){ uint32_t now=millis(); if(now - btnLastChange < 40) return; bool s=digitalRead(PIN_BTN); if(s==LOW && btnPrevState==HIGH){ } else if(s==HIGH && btnPrevState==LOW){ if(btnWindowStart==0) btnWindowStart=now; btnClickCount++; } btnPrevState=s; btnLastChange=now; }
 
+void runWifiManagerOnly(){
+  Serial.begin(115200);
+  delay(100);
+  Serial.println();
+  Serial.println(F("[BOOT] WiFiManager-only test"));
+
+  pinMode(PIN_EN, OUTPUT);
+  driverEnable(false);
+
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+  delay(1000);
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.mode(WIFI_STA);
+
+  String mac4 = macLast4();
+  String apName = "petfeeder-SETUP-" + mac4;
+  Serial.printf("[WIFI] saved SSID: %s\n", WiFi.SSID().c_str());
+  Serial.printf("[WIFI] setup AP SSID: %s security=OPEN channel=%d\n", apName.c_str(), WIFI_SETUP_AP_CHANNEL);
+
+  WiFiManager wm(Serial);
+  wm.setDebugOutput(true);
+  wm.setCleanConnect(true);
+  wm.setWiFiAPChannel(WIFI_SETUP_AP_CHANNEL);
+  wm.setAPStaticIPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  wm.setConnectTimeout(12);
+  wm.setSaveConnectTimeout(18);
+  wm.setConnectRetries(1);
+  wm.setConfigPortalTimeout(0);
+  wm.setCustomMenuHTML("<form action='/wifi/reset' method='get'><button class='D'>Effacer WiFi + reboot AP</button></form><br/>\n");
+  const char *wmMenu[] = {"wifi", "info", "custom", "restart", "exit"};
+  wm.setMenu(wmMenu, 5);
+  wm.setWebServerCallback([&wm](){
+    if(!wm.server) return;
+    wm.server->on("/wifi/reset", [&wm](){
+      Serial.println(F("[WIFI] portal credentials reset requested"));
+      wm.server->send(200, "text/html; charset=utf-8",
+        "<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+        "<style>body{background:#0b0b0f;color:#e7e9ee;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;display:grid;place-items:center;height:100vh;margin:0}.box{background:#15151c;border:1px solid #2b2e45;border-radius:16px;padding:24px;text-align:center}</style>"
+        "<div class='box'><h2>WiFi effacé</h2><p>Redémarrage en AP setup…</p><p>Reconnecte-toi à <b>petfeeder-SETUP-XXXX</b>, puis ouvre <b>http://192.168.4.1</b>.</p></div>"
+      );
+      delay(300);
+      WiFi.persistent(true);
+      WiFi.disconnect(true, true);
+      delay(500);
+      WiFi.persistent(false);
+      ESP.restart();
+    });
+  });
+  wm.setAPCallback([](WiFiManager *manager){
+    Serial.printf("[WIFI] setup AP ready: %s @ %s channel=%d clients=%u\n",
+      manager->getConfigPortalSSID().c_str(),
+      WiFi.softAPIP().toString().c_str(),
+      WiFi.channel(),
+      WiFi.softAPgetStationNum());
+  });
+
+  bool ok;
+  if(WiFi.SSID().length()==0){
+    Serial.println(F("[WIFI] no saved credentials; starting config portal"));
+    ok = wm.startConfigPortal(apName.c_str());
+  } else {
+    Serial.println(F("[WIFI] saved credentials found; using autoConnect"));
+    ok = wm.autoConnect(apName.c_str());
+  }
+
+  Serial.printf("[WIFI] result=%s status=%d ssid=%s ip=%s\n",
+    ok ? "OK" : "FAIL",
+    WiFi.status(),
+    WiFi.SSID().c_str(),
+    WiFi.localIP().toString().c_str());
+  if(!ok){
+    delay(2000);
+    ESP.restart();
+  }
+}
+
 // ---------- SETUP / LOOP ----------
 void setup(){
+#if WIFI_MANAGER_ONLY
+  runWifiManagerOnly();
+  return;
+#endif
+  Serial.begin(115200);
+  delay(50);
+  Serial.println();
+  Serial.println(F("[BOOT] PetFeeder starting"));
+
+  apClientConnectedHandler = WiFi.onSoftAPModeStationConnected([](const WiFiEventSoftAPModeStationConnected& e){
+    Serial.printf("[AP] client connected %02X:%02X:%02X:%02X:%02X:%02X aid=%u clients=%u\n", e.mac[0],e.mac[1],e.mac[2],e.mac[3],e.mac[4],e.mac[5],e.aid, WiFi.softAPgetStationNum());
+  });
+  apClientDisconnectedHandler = WiFi.onSoftAPModeStationDisconnected([](const WiFiEventSoftAPModeStationDisconnected& e){
+    Serial.printf("[AP] client disconnected %02X:%02X:%02X:%02X:%02X:%02X aid=%u clients=%u\n", e.mac[0],e.mac[1],e.mac[2],e.mac[3],e.mac[4],e.mac[5],e.aid, WiFi.softAPgetStationNum());
+  });
+  staConnectedHandler = WiFi.onStationModeConnected([](const WiFiEventStationModeConnected& e){
+    Serial.printf("[WIFI] connected event ssid=%s channel=%u\n", e.ssid.c_str(), e.channel);
+  });
+  staDisconnectedHandler = WiFi.onStationModeDisconnected([](const WiFiEventStationModeDisconnected& e){
+    Serial.printf("[WIFI] disconnected ssid=%s reason=%u\n", e.ssid.c_str(), (uint8_t)e.reason);
+  });
+  staGotIpHandler = WiFi.onStationModeGotIP([](const WiFiEventStationModeGotIP& e){
+    Serial.printf("[WIFI] got ip=%s gw=%s mask=%s\n", e.ip.toString().c_str(), e.gw.toString().c_str(), e.mask.toString().c_str());
+  });
+
   pinMode(PIN_DIR,OUTPUT); pinMode(PIN_STEP,OUTPUT); pinMode(PIN_EN,OUTPUT); pinMode(PIN_BTN,INPUT_PULLUP);
-  driverEnable(cfg.hold_enable); pinMode(LED_BUILTIN, OUTPUT);
+  driverEnable(false); pinMode(LED_BUILTIN, OUTPUT);
 
   LittleFS.begin(); loadConfig(); scheduleLoad(); statsLoad(); statsEnsureToday();
 
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+  delay(1000);
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.mode(WIFI_STA);
+  Serial.printf("[WIFI] saved SSID: %s\n", WiFi.SSID().c_str());
   String mac4=macLast4(); mac4.toCharArray(macSuffix,sizeof(macSuffix));
   String base = cfg.device_name; base.toLowerCase(); for(size_t i=0;i<base.length();++i){ char c=base[i]; if(!((c>='a'&&c<='z')||(c>='0'&&c<='9')||c=='-')) base.setCharAt(i,'-');}
   if(base.length()==0) base="petfeeder";
@@ -782,9 +912,52 @@ void setup(){
   hostName = base + "-" + mac4;
   WiFi.hostname(hostName);
 
-  WiFiManager wm; wm.setClass("invert"); wm.setHostname(hostName);
-  String apName = base + "-SETUP";
-  if(!wm.autoConnect(apName.c_str())){ ESP.restart(); }
+  WiFiManager wm(Serial); wm.setClass("invert"); wm.setHostname(hostName); wm.setDebugOutput(true); wm.setCleanConnect(true);
+  wm.setWiFiAPChannel(WIFI_SETUP_AP_CHANNEL);
+  wm.setAPStaticIPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1), IPAddress(255, 255, 255, 0));
+  wm.setConnectTimeout(12);
+  wm.setSaveConnectTimeout(18);
+  wm.setConnectRetries(1);
+  wm.setConfigPortalTimeout(0);
+  wm.setCustomMenuHTML("<form action='/wifi/reset' method='get'><button class='D'>Effacer WiFi + reboot AP</button></form><br/>\n");
+  const char *wmMenu[] = {"wifi", "info", "custom", "restart", "exit"};
+  wm.setMenu(wmMenu, 5);
+  wm.setWebServerCallback([&wm](){
+    if(!wm.server) return;
+    wm.server->on("/wifi/reset", [&wm](){
+      Serial.println(F("[WIFI] portal credentials reset requested"));
+      wm.server->send(200, "text/html; charset=utf-8",
+        "<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+        "<style>body{background:#0b0b0f;color:#e7e9ee;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;display:grid;place-items:center;height:100vh;margin:0}.box{background:#15151c;border:1px solid #2b2e45;border-radius:16px;padding:24px;text-align:center}</style>"
+        "<div class='box'><h2>WiFi effacé</h2><p>Redémarrage en AP setup…</p><p>Reconnecte-toi à <b>petfeeder-SETUP-XXXX</b>, puis ouvre <b>http://192.168.4.1</b>.</p></div>"
+      );
+      delay(300);
+      WiFi.persistent(true);
+      WiFi.disconnect(true, true);
+      delay(500);
+      WiFi.persistent(false);
+      ESP.restart();
+    });
+  });
+  wm.setAPCallback([](WiFiManager *manager){
+    Serial.printf("[WIFI] setup AP ready: %s @ %s channel=%d clients=%u\n", manager->getConfigPortalSSID().c_str(), WiFi.softAPIP().toString().c_str(), WiFi.channel(), WiFi.softAPgetStationNum());
+  });
+  wm.setSaveConfigCallback([](){
+    Serial.println(F("[WIFI] credentials saved"));
+  });
+  String apName = base + "-SETUP-" + mac4;
+  bool wifiReady = false;
+  Serial.printf("[WIFI] setup AP SSID: %s security=OPEN channel=%d\n", apName.c_str(), WIFI_SETUP_AP_CHANNEL);
+  if(WiFi.SSID().length()==0){
+    Serial.println(F("[WIFI] no saved credentials; starting setup AP immediately"));
+    wifiReady = wm.startConfigPortal(apName.c_str());
+  } else {
+    Serial.println(F("[WIFI] saved credentials found; trying STA before setup AP"));
+    wifiReady = wm.autoConnect(apName.c_str());
+  }
+  if(!wifiReady){ ESP.restart(); }
+  Serial.printf("[WIFI] connected: %s ip=%s\n", WiFi.SSID().c_str(), WiFi.localIP().toString().c_str());
+  driverEnable(cfg.hold_enable);
 
   configTime(0,0,"pool.ntp.org","time.nist.gov"); applyTZ();
 
@@ -806,6 +979,7 @@ void setup(){
     server.on("/logs/download", HTTP_GET, handleLogsDownload);
     server.on("/logs/clear", HTTP_GET, handleLogsClear);
     server.on("/stats/clear", HTTP_GET, handleStatsClear);
+    server.on("/wifi/reset", HTTP_GET, handleWifiReset);
     server.on("/factory", HTTP_GET, handleFactory);
 
     server.on("/status", HTTP_GET, handleStatus);
@@ -837,6 +1011,10 @@ void setup(){
 }
 
 void loop(){
+#if WIFI_MANAGER_ONLY
+  delay(1000);
+  return;
+#endif
   ArduinoOTA.handle();
   server.handleClient();
   if(cfg.mqtt_enable){ if(!mqtt.connected()) mqttReconnect(); mqtt.loop(); }

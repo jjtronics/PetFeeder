@@ -60,6 +60,12 @@ Motor coils (NEMA17 17HE12‑1204S example):
 4. Flash the board. On first boot the access point `<device_name>-SETUP` will appear.
 5. Connect and configure Wi‑Fi credentials, timezone, quotas, etc.
 
+### ESP8266 Wi‑Fi notes
+
+- The setup portal uses an open WiFiManager AP named `<device_name>-SETUP-XXXX`, forced to channel 6, at `http://192.168.4.1`.
+- A **Reset Wi‑Fi** button is available from the normal Settings page and from the WiFiManager portal. It clears only the ESP8266 Wi‑Fi credentials, then reboots into setup AP mode.
+- If an ESP8266 sees the home SSID but fails to connect, or the setup SSID appears/disappears, check the home access point channel. We reproduced an incompatibility with a new home AP on channel 1; moving the home AP to channel 5 made the ESP8266 connect reliably again. Keeping the home AP on a fixed 2.4 GHz channel such as 5 or 6, with 20 MHz width, is recommended.
+
 Below are screenshots of the web interface:
 
 ![1](docs/images/animation_light.gif)
@@ -148,6 +154,12 @@ Bobines moteur (ex. NEMA17 17HE12‑1204S) :
 4. Téléverser le firmware. Au premier démarrage, le point d'accès `<device_name>-SETUP` apparaît.
 5. S'y connecter pour configurer le Wi‑Fi, le fuseau horaire, les quotas, etc.
 
+### Notes Wi‑Fi ESP8266
+
+- Le portail de configuration utilise un AP WiFiManager ouvert nommé `<device_name>-SETUP-XXXX`, forcé sur le canal 6, disponible sur `http://192.168.4.1`.
+- Un bouton **Effacer WiFi** est disponible dans la page Paramètres normale et dans le portail WiFiManager. Il efface uniquement les identifiants Wi‑Fi stockés par l’ESP8266, puis redémarre en mode AP setup.
+- Si l’ESP8266 voit le SSID domestique mais ne s’y connecte pas, ou si le SSID setup apparaît/disparaît, vérifier le canal du point d’accès domestique. Un problème a été reproduit avec un nouvel AP domestique en canal 1 ; le passage de cet AP en canal 5 a rendu la connexion ESP8266 fiable. Il est recommandé de garder le Wi‑Fi domestique 2,4 GHz sur un canal fixe comme 5 ou 6, en largeur 20 MHz.
+
 Voici quelques captures d’écran de l’interface :
 
 ![1](docs/images/animation_light.gif)
@@ -177,4 +189,3 @@ Design mécanique dérivé du projet PEDRO de Manutechlab. Électronique et firm
   
 ### Licence
 Ce projet est publié sous licence MIT. Voir <a href="LICENSE" target="_blank">LICENSE</a>.
-
